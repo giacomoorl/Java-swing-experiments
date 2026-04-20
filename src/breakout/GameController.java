@@ -106,7 +106,7 @@ public class GameController {
         if (tuttiDistrutti(mattoni)) {
             stato.prossimoLivello();
             pallina.aumentaVelocita(stato.getLivello());
-            reward += 30 + + stato.getLivello() * 10;;
+            reward += 30 + stato.getLivello() * 10;;
         }
     }
 

@@ -82,7 +82,9 @@ public class RewardPlotter extends JPanel {
         if (max == min) return;
 
         Graphics2D g2 = (Graphics2D) g;
-
+        
+        g2.setColor(Color.WHITE);
+        g2.drawString("Training AI - Reward per Episodio", w / 2 - 100, 20);
         // sfondo
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, w, h);
