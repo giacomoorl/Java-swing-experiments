@@ -3,7 +3,7 @@ package breakout;
 import java.util.List;
 import java.io.FileWriter;
 
-public class RLManager {
+public class RLManager{
 
     private AgenteRL agente;
 

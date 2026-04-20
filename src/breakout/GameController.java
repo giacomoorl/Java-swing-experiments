@@ -50,7 +50,7 @@ public class GameController {
         // ===== PADDLE =====
         if (pallina.rettangolo().intersects(asticella.rettangolo())) {
             pallina.rimbalzaAsticella(asticella);
-            reward += 30; // reward forte e chiaro
+            reward += 5; // reward forte e chiaro
         }
 
         // ===== MATTONI =====
@@ -63,7 +63,7 @@ public class GameController {
                     pallina.invertiDirezioney();
                     stato.aggiungiPunti(10);
 
-                    reward += 100; // MOLTO importante
+                    reward += 10; // MOLTO importante
                 }
             }
         }
@@ -82,7 +82,7 @@ public class GameController {
         boolean perso = false;
 
         if (pallina.dammiY() > 800) {
-            reward -= 200;   // punizione forte
+            reward -= 50;   // punizione forte
             perso = true;
         }
         
@@ -106,7 +106,7 @@ public class GameController {
         if (tuttiDistrutti(mattoni)) {
             stato.prossimoLivello();
             pallina.aumentaVelocita(stato.getLivello());
-            reward += 200;
+            reward += 30 + + stato.getLivello() * 10;;
         }
     }
 

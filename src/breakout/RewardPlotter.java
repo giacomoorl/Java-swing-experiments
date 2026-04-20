@@ -14,7 +14,7 @@ public class RewardPlotter extends JPanel {
         setBackground(Color.BLACK);
 
         // aggiorna ogni secondo
-        new javax.swing.Timer(1000, e -> repaint()).start();
+        new Timer(1000, e -> repaint()).start();
     }
 
     private List<Double> leggi() {
@@ -25,12 +25,14 @@ public class RewardPlotter extends JPanel {
             while ((line = br.readLine()) != null) {
                 r.add(Double.parseDouble(line));
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return r;
     }
 
-    // MEDIA MOBILE per rendere il grafico leggibile
+    // MEDIA MOBILE
     private List<Double> media(List<Double> dati, int window) {
         List<Double> out = new ArrayList<>();
 
@@ -57,19 +59,22 @@ public class RewardPlotter extends JPanel {
         List<Double> dati = leggi();
         if (dati.size() < 2) return;
 
-        // smoothing (IMPORTANTISSIMO)
-        List<Double> r = media(dati, 50);
+        // limita punti (performance)
+        int maxPoints = 500;
+        if (dati.size() > maxPoints) {
+            dati = dati.subList(dati.size() - maxPoints, dati.size());
+        }
+
+        List<Double> smooth = media(dati, 50);
 
         int w = getWidth();
         int h = getHeight();
-
         int margin = 40;
 
-        // trova min e max
         double max = Double.NEGATIVE_INFINITY;
         double min = Double.POSITIVE_INFINITY;
 
-        for (double v : r) {
+        for (double v : dati) {
             if (v > max) max = v;
             if (v < min) min = v;
         }
@@ -78,37 +83,56 @@ public class RewardPlotter extends JPanel {
 
         Graphics2D g2 = (Graphics2D) g;
 
-        // ===== SFONDO =====
+        // sfondo
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, w, h);
 
-        // ===== ASSI =====
+        // assi
         g2.setColor(Color.WHITE);
-
-        // asse X
         g2.drawLine(margin, h - margin, w - margin, h - margin);
-
-        // asse Y
         g2.drawLine(margin, margin, margin, h - margin);
 
-        // ===== ETICHETTE =====
         g2.drawString("Episodi", w / 2, h - 5);
         g2.drawString("Reward", 5, h / 2);
 
-        // ===== SCALA Y =====
-        g2.drawString(String.format("%.0f", max), 5, margin);
-        g2.drawString(String.format("%.0f", min), 5, h - margin);
+        // scala Y (5 tacche)
+        for (int i = 0; i <= 5; i++) {
+            double val = min + i * (max - min) / 5;
+            int y = h - margin - (int)((val - min) / (max - min) * (h - 2 * margin));
+            g2.drawString(String.format("%.0f", val), 5, y);
+        }
 
-        // ===== GRAFICO =====
+        double stepX = (double)(w - 2 * margin) / (dati.size() - 1);
+
+        // scala X
+        int step = Math.max(1, dati.size() / 10);
+        for (int i = 0; i < dati.size(); i += step) {
+            int x = (int)(margin + i * stepX);
+            g2.drawString(String.valueOf(i), x, h - margin + 15);
+        }
+
+        // ===== DATI REALI (verde) =====
         g2.setColor(Color.GREEN);
 
-        for (int i = 1; i < r.size(); i++) {
+        for (int i = 1; i < dati.size(); i++) {
+            int x1 = (int)(margin + (i - 1) * stepX);
+            int x2 = (int)(margin + i * stepX);
 
-            int x1 = margin + (i - 1) * (w - 2 * margin) / r.size();
-            int x2 = margin + i * (w - 2 * margin) / r.size();
+            int y1 = h - margin - (int)((dati.get(i - 1) - min) / (max - min) * (h - 2 * margin));
+            int y2 = h - margin - (int)((dati.get(i) - min) / (max - min) * (h - 2 * margin));
 
-            int y1 = h - margin - (int)((r.get(i - 1) - min) / (max - min) * (h - 2 * margin));
-            int y2 = h - margin - (int)((r.get(i) - min) / (max - min) * (h - 2 * margin));
+            g2.drawLine(x1, y1, x2, y2);
+        }
+
+        // ===== MEDIA (rosso) =====
+        g2.setColor(Color.RED);
+
+        for (int i = 1; i < smooth.size(); i++) {
+            int x1 = (int)(margin + (i - 1) * stepX);
+            int x2 = (int)(margin + i * stepX);
+
+            int y1 = h - margin - (int)((smooth.get(i - 1) - min) / (max - min) * (h - 2 * margin));
+            int y2 = h - margin - (int)((smooth.get(i) - min) / (max - min) * (h - 2 * margin));
 
             g2.drawLine(x1, y1, x2, y2);
         }
