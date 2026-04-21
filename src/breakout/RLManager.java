@@ -4,9 +4,9 @@ import java.util.List;
 import java.io.FileWriter;
 
 public class RLManager{
-
+    // CAMPI DATI , RIFERIMENTO ALL'AGENTE CHE  GESTISCE
     private AgenteRL agente;
-
+    // COSTRUTTORE
     public RLManager(AgenteRL agente) {
         this.agente = agente;
     }
@@ -26,14 +26,15 @@ public class RLManager{
     public void step(int stato, int azione, int reward, int nuovoStato) {
         if (agente.trainer) {
             agente.aggiungiReward(reward);
-            agente.aggiornaTabellaQ(stato, azione, reward, nuovoStato);
+            agente.aggiornaTabella(stato, azione, reward, nuovoStato);
         }
     }
     public List<Double> getRewardStorico(){
         return agente.getRewardStorico();
     }
     public void fineEpisodio() {
-        if (!agente.trainer) return;
+        if (!agente.trainer) 
+            return;
 
         agente.incrementaEpisodi();
         agente.riduciEpsilon();

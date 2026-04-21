@@ -1,10 +1,18 @@
 package breakout;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RewardPlotter extends JPanel {
@@ -13,40 +21,36 @@ public class RewardPlotter extends JPanel {
         setPreferredSize(new Dimension(800, 300));
         setBackground(Color.BLACK);
 
-        // aggiorna ogni secondo
         new Timer(1000, e -> repaint()).start();
     }
 
     private List<Double> leggi() {
-        List<Double> r = new ArrayList<>();
+        List<Double> dati = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader("rewards.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
-                r.add(Double.parseDouble(line));
+                dati.add(Double.parseDouble(line));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // ignora errori
         }
 
-        return r;
+        return dati;
     }
 
-    // MEDIA MOBILE
     private List<Double> media(List<Double> dati, int window) {
         List<Double> out = new ArrayList<>();
 
         for (int i = 0; i < dati.size(); i++) {
             int start = Math.max(0, i - window);
             double sum = 0;
-            int count = 0;
 
             for (int j = start; j <= i; j++) {
                 sum += dati.get(j);
-                count++;
             }
 
-            out.add(sum / count);
+            out.add(sum / (i - start + 1));
         }
 
         return out;
@@ -59,32 +63,26 @@ public class RewardPlotter extends JPanel {
         List<Double> dati = leggi();
         if (dati.size() < 2) return;
 
-        // limita punti (performance)
-        int maxPoints = 500;
+        // prendi ultimi 200
+        int maxPoints = 200;
         if (dati.size() > maxPoints) {
             dati = dati.subList(dati.size() - maxPoints, dati.size());
         }
 
-        List<Double> smooth = media(dati, 50);
+        List<Double> smooth = media(dati, 20);
 
         int w = getWidth();
         int h = getHeight();
         int margin = 40;
 
-        double max = Double.NEGATIVE_INFINITY;
-        double min = Double.POSITIVE_INFINITY;
-
-        for (double v : dati) {
-            if (v > max) max = v;
-            if (v < min) min = v;
-        }
+        // trova min e max
+        double min = Collections.min(dati);
+        double max = Collections.max(dati);
 
         if (max == min) return;
 
         Graphics2D g2 = (Graphics2D) g;
-        
-        g2.setColor(Color.WHITE);
-        g2.drawString("Training AI - Reward per Episodio", w / 2 - 100, 20);
+
         // sfondo
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, w, h);
@@ -97,23 +95,9 @@ public class RewardPlotter extends JPanel {
         g2.drawString("Episodi", w / 2, h - 5);
         g2.drawString("Reward", 5, h / 2);
 
-        // scala Y (5 tacche)
-        for (int i = 0; i <= 5; i++) {
-            double val = min + i * (max - min) / 5;
-            int y = h - margin - (int)((val - min) / (max - min) * (h - 2 * margin));
-            g2.drawString(String.format("%.0f", val), 5, y);
-        }
-
         double stepX = (double)(w - 2 * margin) / (dati.size() - 1);
 
-        // scala X
-        int step = Math.max(1, dati.size() / 10);
-        for (int i = 0; i < dati.size(); i += step) {
-            int x = (int)(margin + i * stepX);
-            g2.drawString(String.valueOf(i), x, h - margin + 15);
-        }
-
-        // ===== DATI REALI (verde) =====
+        // ===== LINEA VERDE (dati reali) =====
         g2.setColor(Color.GREEN);
 
         for (int i = 1; i < dati.size(); i++) {
@@ -126,7 +110,7 @@ public class RewardPlotter extends JPanel {
             g2.drawLine(x1, y1, x2, y2);
         }
 
-        // ===== MEDIA (rosso) =====
+        // ===== LINEA ROSSA (media) =====
         g2.setColor(Color.RED);
 
         for (int i = 1; i < smooth.size(); i++) {

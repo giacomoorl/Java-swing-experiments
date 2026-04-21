@@ -86,7 +86,7 @@ public class AgenteRL {
             epsilon = 0.01;
     }
     // ===== AGGIORNA Q-TABLE =====
-    public void aggiornaTabellaQ(int stato, int azione, int ricompensa, int nuovoStato){
+    public void aggiornaTabella(int stato, int azione, int ricompensa, int nuovoStato){
         if (stato < 0 || nuovoStato < 0 || stato >= tabellaQ.length || nuovoStato >= tabellaQ.length)
             return;
 
@@ -160,4 +160,4 @@ public class AgenteRL {
     public void setEpsilon(double epsilon){
         this.epsilon = epsilon;
     }
-}
+}   
