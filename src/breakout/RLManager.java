@@ -2,7 +2,9 @@ package breakout;
 
 import java.util.List;
 import java.io.FileWriter;
-
+/*
+* Classe che fa da intermediario da l'agente e il resto del sistema 
+*/
 public class RLManager{
     // CAMPI DATI , RIFERIMENTO ALL'AGENTE CHE  GESTISCE
     private AgenteRL agente;
@@ -23,7 +25,7 @@ public class RLManager{
         agente.trainer = training;
     }
     
-    public void step(int stato, int azione, int reward, int nuovoStato) {
+    public void aggiornaApprendimento(int stato, int azione, int reward, int nuovoStato) {
         if (agente.trainer) {
             agente.aggiungiReward(reward);
             agente.aggiornaTabella(stato, azione, reward, nuovoStato);

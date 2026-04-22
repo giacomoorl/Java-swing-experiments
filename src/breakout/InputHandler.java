@@ -4,13 +4,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
- * Gestisce input tastiera
+ * intercetta l'input da tastiera
  */
 public class InputHandler implements KeyListener {
-
+    // CAMPI DATI , RIFERIMENTI AL CONTROLLER E LA VIEW
     private GameController controller;
     private GameView view;
-
+    // COSTRUTTORE
     public InputHandler(GameController controller, GameView view) {
         this.controller = controller;
         this.view = view;

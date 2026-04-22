@@ -1,7 +1,9 @@
 package breakout;
-
+/*
+* Classe che dice all'asticella e la pallina dove mettersi
+*/
 public class GameState {
-
+    // CAMPI DATI 
     private Asticella asticella;
     private Pallina pallina;
     private Mattoncino[][] mattoncini;
@@ -13,7 +15,7 @@ public class GameState {
     private final int livelloMassimo = 5;
     private final int numRighe = 5;
     private final int numColonne = 10;
-
+    // COSTRUTTORE
     public GameState() {
         System.out.println("Stato creato");
         livello = 1;

@@ -1,5 +1,7 @@
 package breakout;
-
+/*
+* Controller principale del gioco
+*/
 public class GameController {
     // CAMPI DATI
     private boolean aiAttiva = false;
@@ -8,21 +10,55 @@ public class GameController {
     private static final int ALTEZZA= 800;
     private RLManager rlManager;
     private StateEncoder encoder;
-    
+    // COSTRUTTORE
     public GameController(GameState stato){
         System.out.println("Controller creato");
         this.stato = stato;
         this.encoder = new StateEncoder();
     }
+    // IMPOSTA RLMANAGER
     public void setRLManager(RLManager rlManager){
         this.rlManager = rlManager;
     }
-  
-
+    // ATTIVA L'AI
     public void attivaAI(boolean attiva){
         aiAttiva = attiva;
     }
-
+    // RITORNA SE I MATTONI SONO TUTTI DISTRUTTI
+    private boolean tuttiDistrutti(Mattoncino[][] mattoni) {
+        for (int i = 0; i < mattoni.length; i++)
+            for (int j = 0; j < mattoni[i].length; j++)
+                if(!mattoni[i][j].èDistrutto())
+                    return false;
+            return true;
+       }
+    // MUOVE A SINISTRA L'ASTICELLA
+    public void muoviSinistra() {
+        stato.getAsticella().muovitiSinistra();
+    }
+    // MUOVE A DESTRA L'ASTICELLA 
+    public void muoviDestra(int larghezza) {
+        stato.getAsticella().muovitiDestra(larghezza);
+    }
+    // RITORNA LO STATO CORRENTE 
+    public GameState getStato() {
+        return stato;
+    }
+    // METODO PER DIRE AL CONTROLLER DI AGGIORNARE LO STATO 
+    // ALL'ENCODER CHIEDE LO STATO ATTUALE 
+    // INIZIALIAZZA L'AZIONE A 0 ( FERMO ) E LA REWARD A 0
+    // CONTROLLA SE L'AI È ATTIVA E SE RLMANAGER È DIVERSO DA NULL
+    // E SE SI DICE A RLMANAGER DI SCEGLIERE L'AZIONE ( CHE A SUA VOLTA LO CHIEDE ALL'AGENTE )
+    // IN OGNI CASO DICE ALLA PALLINA DI MUOVERSI E DI RIMBALZARE SUI MURI
+    // CONTROLLA LO STATO DEI MATTONI E SE LA PALLINA TOCCA IL MATTONCINO 
+    // LO DISTRUGGE E INVERTE LA DIREZIONE DELLA PALLINA E DICE ALLO STATO 
+    // DI AUMENTARE IL PUNTEGGIO
+    // CONTROLLA LA DISTANZA TRA PADDLE E PALLINA ( IN CASO L'AI SIA ATTIVA )
+    // CONTROLLA SE LA PARTITA È FINITA 
+    // SI FA DARE LO STATO DALL'ENCODER ( CHE PER IL CONTROLLER È IL NUOVO STATO 
+    // , DOPO QUELLO SUCCESSO PRIMA E CONTROLLA SE L'AI È ATTIVA E RLMANAGER != NULL 
+    // E SE SI , DICE ALL' RLMANAGER DI AGGIORNARE L'APPRENDIMENTO E INFINE CONTROLLA SE TUTTI I MATTONI SONO STATI DITRUTTI 
+    // E SE SI DICE ALLO STATO DI CAMBIARE LIVELLO
     public void aggiorna(){
 
         Pallina pallina = stato.getPallina();
@@ -34,7 +70,7 @@ public class GameController {
         int reward = 0;
        
         // ===== AI =====
-        if (aiAttiva && rlManager != null){
+        if(aiAttiva && rlManager != null){
             azione = rlManager.scegliAzione(statoRL);
             
             reward -= 1;  
@@ -91,7 +127,7 @@ public class GameController {
 
         // ===== Q UPDATE =====
         if (aiAttiva && rlManager != null) 
-            rlManager.step(statoRL, azione, reward, nuovoStato);
+            rlManager.aggiornaApprendimento(statoRL, azione, reward, nuovoStato);
         
 
         // ===== FINE EPISODIO =====
@@ -109,25 +145,5 @@ public class GameController {
             pallina.aumentaVelocita(stato.getLivello());
             reward += 300 + stato.getLivello() * 50;
         }
-    }
-
-    private boolean tuttiDistrutti(Mattoncino[][] mattoni) {
-        for (int i = 0; i < mattoni.length; i++)
-            for (int j = 0; j < mattoni[i].length; j++)
-                if (!mattoni[i][j].èDistrutto())
-                    return false;
-        return true;
-    }
-
-    public void muoviSinistra() {
-        stato.getAsticella().muovitiSinistra();
-    }
-
-    public void muoviDestra(int larghezza) {
-        stato.getAsticella().muovitiDestra(larghezza);
-    }
-
-    public GameState getStato() {
-        return stato;
     }
 }

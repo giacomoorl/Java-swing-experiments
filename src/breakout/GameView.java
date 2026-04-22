@@ -5,9 +5,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class GameView extends JPanel {
-
+    // CAMPI DATI
     private GameState stato;
-
+    // COSTRUTTORE
     public GameView(GameState stato) {
         System.out.println("View creata");
         

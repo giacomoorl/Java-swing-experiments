@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 public class PannelloSuperiore extends JPanel {
     private JLabel etichettaPunti;
     private JLabel etichettaLivello;
-
+    // COSTRUTTORE
     public PannelloSuperiore() {
         setBackground(Color.BLUE);
 
@@ -25,11 +25,11 @@ public class PannelloSuperiore extends JPanel {
         add(etichettaPunti);
         add(etichettaLivello);
     }
-
+    // AGGIORNA I PUNTI
     public void aggiornaPunti(int punti) {
         etichettaPunti.setText("Punti: " + punti);
     }
-
+    // AGGIORNA IL LIVELLO
     public void aggiornaLivello(int livello) {
         etichettaLivello.setText("Livello: " + livello);
     }
