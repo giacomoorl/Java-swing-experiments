@@ -5,15 +5,15 @@ package breakout;
 public class GameController {
     // CAMPI DATI
     private boolean aiAttiva = false;
-    private GameState stato;
-    private static final int LARGHEZZA = 1600;
-    private static final int ALTEZZA= 800;
+    private GameState state;
+    private static final int LENGTH = 1600;
+    private static final int HEIGHT= 800;
     private RLManager rlManager;
     private StateEncoder encoder;
     // COSTRUTTORE
-    public GameController(GameState stato){
+    public GameController(GameState state){
         System.out.println("Controller creato");
-        this.stato = stato;
+        this.state = state;
         this.encoder = new StateEncoder();
     }
     // IMPOSTA RLMANAGER
@@ -25,24 +25,24 @@ public class GameController {
         aiAttiva = attiva;
     }
     // RITORNA SE I MATTONI SONO TUTTI DISTRUTTI
-    private boolean tuttiDistrutti(Mattoncino[][] mattoni) {
-        for (int i = 0; i < mattoni.length; i++)
-            for (int j = 0; j < mattoni[i].length; j++)
-                if(!mattoni[i][j].èDistrutto())
+    private boolean allBricks(Brick[][] bricks) {
+        for (int i = 0; i < bricks.length; i++)
+            for (int j = 0; j < bricks[i].length; j++)
+                if(!bricks[i][j].isDestroy())
                     return false;
             return true;
        }
     // MUOVE A SINISTRA L'ASTICELLA
-    public void muoviSinistra() {
-        stato.getAsticella().muovitiSinistra();
+    public void moveLeft() {
+        state.getPaddle().moveSx();
     }
     // MUOVE A DESTRA L'ASTICELLA 
-    public void muoviDestra(int larghezza) {
-        stato.getAsticella().muovitiDestra(larghezza);
+    public void moveRight(int length) {
+        state.getPaddle().moveDx(length);
     }
     // RITORNA LO STATO CORRENTE 
-    public GameState getStato() {
-        return stato;
+    public GameState getState() {
+        return state;
     }
     // METODO PER DIRE AL CONTROLLER DI AGGIORNARE LO STATO 
     // ALL'ENCODER CHIEDE LO STATO ATTUALE 
@@ -59,46 +59,46 @@ public class GameController {
     // , DOPO QUELLO SUCCESSO PRIMA E CONTROLLA SE L'AI È ATTIVA E RLMANAGER != NULL 
     // E SE SI , DICE ALL' RLMANAGER DI AGGIORNARE L'APPRENDIMENTO E INFINE CONTROLLA SE TUTTI I MATTONI SONO STATI DITRUTTI 
     // E SE SI DICE ALLO STATO DI CAMBIARE LIVELLO
-    public void aggiorna(){
+    public void update(){
 
-        Pallina pallina = stato.getPallina();
-        Asticella asticella = stato.getAsticella();
-        Mattoncino[][] mattoni = stato.getMattoncini();
+        Ball ball = state.getBall();
+        Paddle paddle = state.getPaddle();
+        Brick[][] bricks = state.getBricks();
 
-        int statoRL = encoder.encode(stato);
-        int azione = 0;
+        int stateRL = encoder.encode(state);
+        int action = 0;
         int reward = 0;
        
         // ===== AI =====
         if(aiAttiva && rlManager != null){
-            azione = rlManager.scegliAzione(statoRL);
+            action = rlManager.chooseAction(stateRL);
             
             reward -= 1;  
-            if(azione == 1) 
-                muoviSinistra();
-            if(azione == 2) 
-                muoviDestra(1600);
+            if(action == 1) 
+                moveLeft();
+            if(action == 2) 
+                moveRight(1600);
         }
 
         // ===== UPDATE =====
-        pallina.muoviti();
-        pallina.rimbalzaMuri(LARGHEZZA, ALTEZZA);
+        ball.move();
+        ball.bounceWall(LENGTH);
 
         // ===== PADDLE =====
-        if (pallina.rettangolo().intersects(asticella.rettangolo())) {
-            pallina.rimbalzaAsticella(asticella);
+        if (ball.rettangle().intersects(paddle.rettangle())) {
+            ball.bouncePaddle(paddle);
             reward += 20; // Reward se il paddle prende la pallina
         }
 
         // ===== MATTONI =====
-        for (int i = 0; i < mattoni.length; i++) {
-            for (int j = 0; j < mattoni[i].length; j++) {
-                Mattoncino m = mattoni[i][j];
+        for (int i = 0; i < bricks.length; i++) {
+            for (int j = 0; j < bricks[i].length; j++) {
+                Brick brick = bricks[i][j];
 
-                if (!m.èDistrutto() && pallina.rettangolo().intersects(m.rettangolo())) {
-                    m.distruggi();
-                    pallina.invertiDirezioney();
-                    stato.aggiungiPunti(10);
+                if (!brick.isDestroy() && ball.rettangle().intersects(brick.rettangle())) {
+                    brick.destroy();
+                    ball.reverseDirectionY();
+                    state.increasesPoints(10);
 
                     reward += 50; // Se la pallina distrugge un mattoncino
                 }
@@ -106,44 +106,44 @@ public class GameController {
         }
 
         // ===== DISTANZA PALLINA-PADDLE (GUIDA L’AI) =====
-        double centroPalla = pallina.dammiX() + 10;
-        double centroPaddle = asticella.dammiX() + asticella.dammiLarghezza() / 2;
-        double distanza = Math.abs(centroPalla - centroPaddle);
+        double centerBall = ball.getX() + 10;
+        double centerPaddle = paddle.getX() + paddle.getLength() / 2;
+        double distance = Math.abs(centerBall - centerPaddle);
 
-        if (distanza < 50) 
+        if (distance < 50) 
             reward += 2;      // Reward ( Premio ) se il paddle è vicino alla pallina
         else 
             reward -= 2;                    // Punizione se il paddle è lontano dalla pallina
 
         // ===== GAME OVER =====
-        boolean perso = false;
+        boolean lost = false;
 
-        if (pallina.dammiY() > 800) {
+        if (ball.getY() > 800) {
             reward -= 200;   // Punizione se non prende la pallina e finisce la partita
-            perso = true;
+            lost = true;
         }
         
-        int nuovoStato = encoder.encode(stato);
+        int newState = encoder.encode(state);
 
         // ===== Q UPDATE =====
         if (aiAttiva && rlManager != null) 
-            rlManager.aggiornaApprendimento(statoRL, azione, reward, nuovoStato);
+            rlManager.updateLearning(stateRL, action, reward, newState);
         
 
         // ===== FINE EPISODIO =====
-        if (perso){
+        if (lost){
             if (aiAttiva && rlManager != null)
-                 rlManager.fineEpisodio();
+                 rlManager.endEpisode();
 
-            stato.reset();
+            state.reset();
           
         }
 
         // ===== LIVELLO =====
-        if (tuttiDistrutti(mattoni)) {
-            stato.prossimoLivello();
-            pallina.aumentaVelocita(stato.getLivello());
-            reward += 300 + stato.getLivello() * 50;
+        if (allBricks(bricks)) {
+            state.nextLevel();
+            ball.increasesSpeed(state.getLevel());
+            reward += 300 + state.getLevel() * 50;
         }
     }
 }

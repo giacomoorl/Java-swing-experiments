@@ -21,10 +21,10 @@ public class InputHandler implements KeyListener {
         int codice = e.getKeyCode();
 
         if (codice == KeyEvent.VK_LEFT) {
-            controller.muoviSinistra();
+            controller.moveLeft();
         } 
         else if (codice == KeyEvent.VK_RIGHT) {
-            controller.muoviDestra(view.getWidth());
+            controller.moveRight(view.getWidth());
         }
 
         view.repaint();

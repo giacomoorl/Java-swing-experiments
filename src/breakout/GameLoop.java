@@ -11,9 +11,9 @@ public class GameLoop {
     private Timer timer;
     private GameController controller;
     private GameView view;
-    private PannelloSuperiore top;
+    private TopPanel top;
     // COSTRUTTORE
-    public GameLoop(GameController controller, GameView view, PannelloSuperiore top) {
+    public GameLoop(GameController controller, GameView view, TopPanel top) {
         System.out.println("Loop creato");
       
         this.controller = controller;
@@ -21,35 +21,35 @@ public class GameLoop {
         this.top = top;
 
         // 16 ms ≈ 60 FPS
-        timer = new Timer(16, e -> aggiorna());
+        timer = new Timer(16, e -> update());
     }
     // METODO CHE AGGIORNA LO STATO DEL GIOCO OGNI 16 MS
     // DICE AL CONTROLLER DI AGGIORNARE IL GIOCO OGNI 16 MS
     // DICE AL PANNELLO SUPERIORE DI AGGIORNARE PUNTI E LIVEELO OGNI 16 MS
     // DICE ALLA VIEW DI RISDISEGNARE LO SCHERMO DEL GIOCO
-    private void aggiorna() {
+    private void update() {
        
-        controller.aggiorna();  
+        controller.update();  
         
         // aggiorna punti e livello nel pannello superiore
-        top.aggiornaPunti(controller.getStato().getPunti());
-        top.aggiornaLivello(controller.getStato().getLivello());
+        top.updatePoints(controller.getState().getPoints());
+        top.updateLevel(controller.getState().getLevel());
      
         view.repaint();
     }
 
     // ===== METODI PER AVVIARE/FERMARE =====
-    public void avviaManuale() {
+    public void runManual() {
         controller.attivaAI(false);
         timer.start();
     }
 
-    public void avviaAI() {
+    public void runAI() {
         controller.attivaAI(true);
         timer.start();
     }
 
-    public void ferma() {
+    public void stop() {
         timer.stop();
     }
 }

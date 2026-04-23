@@ -2,17 +2,16 @@ package breakout;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
-
-public class FinestraPrincipale extends JFrame {
-
-    public FinestraPrincipale(GameView view, PannelloSuperiore top,
-                              PannelloInferiore bottom) {
+/*
+* CLASSE CHE RAPPRESENTA LA FINESTRA DI GIOCO
+*/
+public class MainWindow extends JFrame {
+    // COSTRUTTORE
+    public MainWindow(GameView view, TopPanel top, BottomPanel bottom) {
 
         super("Breakout");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-      
-
-       setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
         add(top, BorderLayout.NORTH);
         add(view, BorderLayout.CENTER);

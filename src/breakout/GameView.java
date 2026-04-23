@@ -6,31 +6,31 @@ import java.awt.Graphics;
 
 public class GameView extends JPanel {
     // CAMPI DATI
-    private GameState stato;
+    private GameState state;
     // COSTRUTTORE
-    public GameView(GameState stato) {
+    public GameView(GameState state) {
         System.out.println("View creata");
         
-        this.stato = stato;
+        this.state = state;
         setBackground(Color.BLACK);
         setFocusable(true);
     }
-
+    // AD OGNI REPAINT DISEGNA GLI OGGETTI IN GIOCO
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Disegna asticella
-        stato.getAsticella().disegnati(g);
+        // DISEGNA PADDLE
+        state.getPaddle().draw(g);
 
-        // Disegna pallina
-        stato.getPallina().disegnati(g);
+        // DISEGNA PALLINA
+        state.getBall().draw(g);
 
-        // Disegna mattoni
-        Mattoncino[][] mattoni = stato.getMattoncini();
-        for (int i = 0; i < mattoni.length; i++) {
-            for (int j = 0; j < mattoni[i].length; j++) {
-                mattoni[i][j].disegnati(g);
+        // DISEGNA MATTONCINI
+        Brick[][] bricks = state.getBricks();
+        for (int i = 0; i < bricks.length; i++) {
+            for (int j = 0; j < bricks[i].length; j++) {
+                bricks[i][j].draw(g);
             }
         }
     }

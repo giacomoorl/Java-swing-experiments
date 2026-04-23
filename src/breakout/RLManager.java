@@ -7,59 +7,61 @@ import java.io.FileWriter;
 */
 public class RLManager{
     // CAMPI DATI , RIFERIMENTO ALL'AGENTE CHE  GESTISCE
-    private AgenteRL agente;
+    private RLAgent agente;
     // COSTRUTTORE
-    public RLManager(AgenteRL agente) {
-        this.agente = agente;
+    public RLManager(RLAgent agent) {
+        this.agente = agent;
     }
-    
+    // DICE ALL'AGENTE DI IMPOSTARE EPSILON
     public void setEpsilon(double e){
         agente.setEpsilon(e);
     }
-    
-    public int scegliAzione(int stato) {
-        return agente.scegliAzione(stato);
+    // SCEGLIE L'AZIONE DA FARE
+    public int chooseAction(int stato) {
+        return agente.chooseAction(stato);
     }
-    
+    // IMPOSTA IL TRAINING
     public void setTraining(boolean training){
         agente.trainer = training;
     }
-    
-    public void aggiornaApprendimento(int stato, int azione, int reward, int nuovoStato) {
+    // DICE ALL'AGENTE DI AGGIUNGERE LA REWARD E DI AGGIORNARE LA TABELLA
+    public void updateLearning(int state, int action, int reward, int newState) {
         if (agente.trainer) {
-            agente.aggiungiReward(reward);
-            agente.aggiornaTabella(stato, azione, reward, nuovoStato);
+            agente.addReward(reward);
+            agente.updateTable(state, action, reward, newState);
         }
     }
+    // DICE ALL'AGENTE DI RITORNARE IL REWARD STORICO
     public List<Double> getRewardStorico(){
-        return agente.getRewardStorico();
+        return agente.getHistoricalReward();
     }
-    public void fineEpisodio() {
+    // DICE ALL'AGENTE COSA FARE IN CASO DI GAME OVER
+    public void endEpisode() {
         if (!agente.trainer) 
             return;
 
-        agente.incrementaEpisodi();
-        agente.riduciEpsilon();
+        agente.increasesEpisodes();
+        agente.reduceEpsilon();
 
-        double totale = agente.chiudiEpisodio();
+        double total = agente.closeEpisode();
         
         try (FileWriter fw = new FileWriter("rewards.txt", true)) {
-            fw.write(totale + "\n");
+            fw.write(total + "\n");
         } 
         catch(Exception e) {}
         
-        System.out.println("EPISODIO: " + agente.dammiEpisodi() +
-                           " | epsilon: " + agente.dammiEpsilon() +
-                           " | reward: " + totale);
+        System.out.println("EPISODIO: " + agente.getEpisodes() +
+                           " | epsilon: " + agente.getEpsilon() +
+                           " | reward: " + total);
 
-        if (agente.dammiEpisodi() % 10 == 0) {
-            agente.salvaTabella("Tabella.txt");
+        if (agente.getEpisodes() % 10 == 0) {
+            agente.saveTable("Table.txt");
         }
        
-        if (agente.dammiEpisodi() >= agente.dammiMaxEpisodi()) {
+        if (agente.getEpisodes() >= agente.getMaxEpisodes()) {
             System.out.println("TRAINING FINITO!");
 
-            agente.salvaTabella("Tabella.txt");
+            agente.saveTable("Table.txt");
             agente.trainer = false;
             agente.setEpsilon(0);
         }

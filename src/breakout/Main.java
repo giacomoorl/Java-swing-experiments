@@ -4,24 +4,24 @@ package breakout;
 */
 public class Main {
         public static void main(String[] args) {
-            GameState stato = new GameState();
-            GameController controller = new GameController(stato);
-            GameView view = new GameView(stato);
+            GameState state = new GameState();
+            GameController controller = new GameController(state);
+            GameView view = new GameView(state);
             // PANNELLOSUPERIORE
-            PannelloSuperiore top = new PannelloSuperiore();
+            TopPanel top = new TopPanel();
             // GAMELOOP
             GameLoop loop = new GameLoop(controller, view, top);
             // ✅ CREA L'AI
-            int numStati = stato.numeroTotaleStati();  
-            AgenteRL agente = new AgenteRL(numStati, 3);   
-            agente.caricaTabella("Tabella.txt"); 
+            int numStati = state.numTotalState();  
+            RLAgent agente = new RLAgent(numStati, 3);   
+            agente.loadTable("Table.txt"); 
             // CREA IL MANAGER AI
             RLManager rlManager = new RLManager(agente);
             controller.setRLManager(rlManager);
             // PANNELLO INFERIORE CON PULSANTI
-            PannelloInferiore bottom = new PannelloInferiore(loop, view, controller, rlManager);
+            BottomPanel bottom = new BottomPanel(loop, view, controller, rlManager);
             // FINESTRA PRINCIPALE
-            new FinestraPrincipale(view, top, bottom);
+            new MainWindow(view, top, bottom);
             // INPUT DA TASTIERA
             InputHandler input = new InputHandler(controller, view);
             view.addKeyListener(input);

@@ -1,9 +1,11 @@
 package breakout;
 
 import javax.swing.*;
-
+/*
+* CLASSE CHE FUNGE DA FINESTRA PER IL GRAFICO 
+*/
 public class RewardWindow extends JFrame {
-
+    // COSTRUTTORE 
     public RewardWindow(RewardPlotter plot) {
 
         super("Reward Graph");

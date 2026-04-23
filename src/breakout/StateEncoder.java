@@ -5,20 +5,20 @@ package breakout;
 */
 public class StateEncoder {
     // CODIFICA LO STATO IN UN NUMERO CHE LO RIASSUME E LO RITORNA 
-    public int encode(GameState stato) {
+    public int encode(GameState state) {
 
-        Pallina pallina = stato.getPallina();
-        Asticella asticella = stato.getAsticella();
+        Ball ball = state.getBall();
+        Paddle paddle = state.getPaddle();
 
         // POSIZIONE PALLINA DIVISA IN 5 COLONNE
-        int col = (int)(pallina.dammiX() / (1600.0 / 5));
+        int col = (int)(ball.getX() / (1600.0 / 5));
         col = Math.max(0, Math.min(4, col));
 
         // DIREZIONE VERTICALE DELLA PALLINA 1 = GIÙ E 0 = SU
-        int direzioneY = pallina.dammiDY() > 0 ? 1 : 0;
+        int directionY = ball.getDY() > 0 ? 1 : 0;
 
         // VELOCITÀ ORIZZONTALE IN 4 CATEGORIE
-        double dx = pallina.dammiDX();
+        double dx = ball.getDX();
         int velX;
         if(dx < -2) 
             velX = 0;
@@ -30,9 +30,9 @@ public class StateEncoder {
             velX = 3;
 
         // DISTANZA TRA PADDLE E PALLINA DIVISA IN 5 VALORI
-        double centroPalla = pallina.dammiX() + 10;
-        double centroPaddle = asticella.dammiX() + asticella.dammiLarghezza()/2;
-        double diff = centroPalla - centroPaddle;
+        double centerBall = ball.getX() + 10;
+        double centerPaddle = paddle.getX() + paddle.getLength()/2;
+        double diff = centerBall - centerPaddle;
 
         int rel;
         if(diff < -60) 
@@ -47,7 +47,7 @@ public class StateEncoder {
             rel = 4;
 
         return col * (2 * 4 * 5)
-             + direzioneY * (4 * 5)
+             + directionY * (4 * 5)
              + velX * 5
              + rel;
     }

@@ -4,32 +4,32 @@ package breakout;
 */
 public class GameState {
     // CAMPI DATI 
-    private Asticella asticella;
-    private Pallina pallina;
-    private Mattoncino[][] mattoncini;
+    private Paddle paddle;
+    private Ball ball;
+    private Brick[][] bricks;
 
-    private int punti;
-    private int livello;
+    private int points;
+    private int level;
     private boolean aiAttiva;
    
-    private final int livelloMassimo = 5;
-    private final int numRighe = 5;
-    private final int numColonne = 10;
+    private final int MaxLevel = 5;
+    private final int numberOfLines = 5;
+    private final int numberOfColumns = 10;
     // COSTRUTTORE
     public GameState() {
         System.out.println("Stato creato");
-        livello = 1;
-        punti = 0;
+        level = 1;
+        points = 0;
         aiAttiva = false;
 
-        asticella = new Asticella(750, 700);
-        pallina = new Pallina(800, 670);
+        paddle = new Paddle(750, 700);
+        ball = new Ball(800, 670);
 
-        creaMattoncini();
+        createBricks();
     }
 
-    private void creaMattoncini() {
-        mattoncini = new Mattoncino[numRighe][numColonne];
+    private void createBricks() {
+        bricks = new Brick[numberOfLines][numberOfColumns];
 
         java.awt.Color[] colori = {
             java.awt.Color.RED,
@@ -40,67 +40,67 @@ public class GameState {
         };
 
         int gap = 10;
-        int totaleGap = gap * (numColonne + 1);
-        int brickWidth = (1600 - totaleGap) / numColonne;
+        int totaleGap = gap * (numberOfColumns + 1);
+        int brickWidth = (1600 - totaleGap) / numberOfColumns;
         int brickHeight = 30;
         int yStart = 50;
 
-        for (int i = 0; i < numRighe; i++) {
-            for (int j = 0; j < numColonne; j++) {
+        for (int i = 0; i < numberOfLines; i++) {
+            for (int j = 0; j < numberOfColumns; j++) {
                 int x = gap + j * (brickWidth + gap);
                 int y = yStart + i * (brickHeight + gap);
 
-                mattoncini[i][j] = new Mattoncino(x, y, brickWidth, brickHeight, colori[i]);
+                bricks[i][j] = new Brick(x, y, brickWidth, brickHeight, colori[i]);
             }
         }
     }
 
     public void reset() {
-        asticella.impostaX(750);
-        asticella.impostaY(700);
-        pallina.impostaPosizione(800, 670);
-        pallina.impostaDX(3);
-        pallina.impostaDY(-3);
-        creaMattoncini();
-        punti = 0;
-        livello = 1;
+        paddle.setX(750);
+        paddle.setY(700);
+        ball.setPosition(800, 670);
+        ball.setDX(3);
+        ball.setDY(-3);
+        createBricks();
+        points = 0;
+        level = 1;
     }
 
-    public int numeroTotaleStati() {
+    public int numTotalState() {
         return 5 * 2 * 4 * 5; 
     }
 
     // ===== GETTER =====
-    public Asticella getAsticella(){
-        return asticella;
+    public Paddle getPaddle(){
+        return paddle;
     }
-    public Pallina getPallina(){
-        return pallina; 
+    public Ball getBall(){
+        return ball; 
     }
-    public Mattoncino[][] getMattoncini(){ 
-        return mattoncini;
+    public Brick[][] getBricks(){ 
+        return bricks;
     }
-    public int getPunti(){
-        return punti; 
+    public int getPoints(){
+        return points; 
     }
-    public int getLivello(){
-        return livello; 
-    }
-
-    public void aggiungiPunti(int p){
-        punti += p; 
+    public int getLevel(){
+        return level; 
     }
 
-    public void prossimoLivello(){
-        if (livello < livelloMassimo){
-            livello++;
+    public void increasesPoints(int p){
+        points += p; 
+    }
+
+    public void nextLevel(){
+        if (level < MaxLevel){
+            level++;
             // reset posizioni
-            asticella.impostaX(750);
-            asticella.impostaY(700);
+            paddle.setX(750);
+            paddle.setY(700);
 
-            pallina.impostaPosizione(800, 670);
-            creaMattoncini();
-            pallina.aumentaVelocita(livello);
+            ball.setPosition(800, 670);
+            createBricks();
+            ball.increasesSpeed(level);
         }
     }
 }

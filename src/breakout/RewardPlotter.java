@@ -14,16 +14,20 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+/*
+* CLASSE CHE DISEGNA IL GRAFICO SULLO SCHERMO
+* NELLA QUALE SI PUÒ VEDERE COME VARIA LA REWARD 
+* ALL'AUMENTARE DEL NUMERO DI EPISODI
+*/
 public class RewardPlotter extends JPanel {
-
+    // COSTRUTTORE
     public RewardPlotter() {
         setPreferredSize(new Dimension(800, 300));
         setBackground(Color.BLACK);
-
+        // AGGIORNA OGNI 1000 MS ( 1 SECONDO )
         new Timer(1000, e -> repaint()).start();
     }
-
+    // LEGGE LE REWARD DA FILE 
     private List<Double> leggi() {
         List<Double> dati = new ArrayList<>();
 
@@ -32,13 +36,12 @@ public class RewardPlotter extends JPanel {
             while ((line = br.readLine()) != null) {
                 dati.add(Double.parseDouble(line));
             }
-        } catch (Exception e) {
-            // ignora errori
-        }
+        } 
+        catch (Exception e) {}
 
         return dati;
     }
-
+    // CALCOLA LA MEDIA
     private List<Double> media(List<Double> dati, int window) {
         List<Double> out = new ArrayList<>();
 
@@ -55,7 +58,7 @@ public class RewardPlotter extends JPanel {
 
         return out;
     }
-
+    // DISEGNA TUTTO 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -63,7 +66,7 @@ public class RewardPlotter extends JPanel {
         List<Double> dati = leggi();
         if (dati.size() < 2) return;
 
-        // prendi ultimi 200
+        // PRENDE ULTIMI 200
         int maxPoints = 200;
         if (dati.size() > maxPoints) {
             dati = dati.subList(dati.size() - maxPoints, dati.size());
@@ -75,19 +78,26 @@ public class RewardPlotter extends JPanel {
         int h = getHeight();
         int margin = 40;
 
-        // trova min e max
+        // TROVA MIN E MAX
         double min = Collections.min(dati);
         double max = Collections.max(dati);
 
-        if (max == min) return;
+        if (max == min) 
+            return;
 
         Graphics2D g2 = (Graphics2D) g;
 
-        // sfondo
+        // SFONDO
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, w, h);
+        // INFO TESTO
+        double ultimo = dati.get(dati.size() - 1);
+        double mediaFinale = smooth.get(smooth.size() - 1);
 
-        // assi
+        g2.setColor(Color.WHITE);
+        g2.drawString("Ultimo: " + (int)ultimo, 50, 20);
+        g2.drawString("Media: " + (int)mediaFinale, 200, 20);
+        // ASSI
         g2.setColor(Color.WHITE);
         g2.drawLine(margin, h - margin, w - margin, h - margin);
         g2.drawLine(margin, margin, margin, h - margin);
