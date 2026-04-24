@@ -31,8 +31,6 @@ class BottomPanel extends JPanel {
             controller.setRLManager(rlManager);
             controller.attivaAI(true);
 
-            rlManager.setEpsilon(0.8);
-
             loop.runAI();
             view.requestFocusInWindow();
         });
@@ -44,7 +42,6 @@ class BottomPanel extends JPanel {
             controller.attivaAI(true);
 
             rlManager.setTraining(false); // ❌ no training
-            rlManager.setEpsilon(0);      // ❌ no random
 
             loop.runAI();
             view.requestFocusInWindow();

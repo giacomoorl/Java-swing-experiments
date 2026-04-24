@@ -13,9 +13,9 @@ public class RLManager{
         this.agente = agent;
     }
     // DICE ALL'AGENTE DI IMPOSTARE EPSILON
-    public void setEpsilon(double e){
+    /*public void setEpsilon(double e){
         agente.setEpsilon(e);
-    }
+    }*/
     // SCEGLIE L'AZIONE DA FARE
     public int chooseAction(int stato) {
         return agente.chooseAction(stato);
@@ -39,20 +39,17 @@ public class RLManager{
     public void endEpisode() {
         if (!agente.trainer) 
             return;
-
-        agente.increasesEpisodes();
-        agente.reduceEpsilon();
-
+         
         double total = agente.closeEpisode();
+        
+        System.out.println("EPISODIO: " + agente.getEpisodes() +
+                           " | epsilon: " + agente.getEpsilon() +
+                           " | reward: " + total);
         
         try (FileWriter fw = new FileWriter("rewards.txt", true)) {
             fw.write(total + "\n");
         } 
         catch(Exception e) {}
-        
-        System.out.println("EPISODIO: " + agente.getEpisodes() +
-                           " | epsilon: " + agente.getEpsilon() +
-                           " | reward: " + total);
 
         if (agente.getEpisodes() % 10 == 0) {
             agente.saveTable("Table.txt");
@@ -63,7 +60,6 @@ public class RLManager{
 
             agente.saveTable("Table.txt");
             agente.trainer = false;
-            agente.setEpsilon(0);
         }
     }
 }

@@ -13,7 +13,7 @@ public class RLAgent {
     private double[][] table;
     private final double alfa = 0.1;
     private final double gamma = 0.9;
-    private double epsilon = 0.8;
+    private double epsilon;
     private List<Double> historicalReward = new ArrayList<>();
     public boolean trainer = true;
     private final Random casual;
@@ -52,10 +52,6 @@ public class RLAgent {
     public int getMaxEpisodes(){
         return maxEpisodes; 
     }
-    // INCREMENTA IL NUMERO DI EPISODI
-    public void increasesEpisodes(){
-        episodes++; 
-    }
     // AGGIUNGE REWARD ALL'EPISODIO CORRENTE
     public void addReward(double r){
         rewardEpisode += r;
@@ -65,6 +61,13 @@ public class RLAgent {
    public double closeEpisode(){
         double total = rewardEpisode;
         rewardEpisode = 0;
+
+        episodes++; // incremento episodio
+
+        epsilon = Math.max(0.05, epsilon * 0.995);
+
+        System.out.println("Nuovo epsilon: " + epsilon);
+        
         return total;
     }
     // SCEGLIE L'AZIONE DA FARE IN BASE ALLO STATO
@@ -85,17 +88,7 @@ public class RLAgent {
             return best;
         }
     }
-    // IMPOSTA EPSILON
-    public void setEpsilon(double epsilon){
-        this.epsilon = epsilon;
-    }
-    // RIDUCE L'ESPLORAZIONE NEL TEMPO
-    // L'AI DIVENTA SEMPRE PIÙ "SICURA"
-    public void reduceEpsilon(){
-        epsilon *= 0.995;
-        if (epsilon < 0.01) 
-            epsilon = 0.01;
-    }
+   
     // AGGIORNA LA Q-TABLE IN BASE ALLA RICOMPENSA OTTENUTA
     // PIÙ UNA SCELTA È BUONA → PIÙ AUMENTA IL SUO VALORE
     public void updateTable(int state, int action, int reward, int newState){
@@ -112,48 +105,74 @@ public class RLAgent {
     // SALVA LA TABELLA DI APPRENDIMENTO
     public void saveTable(String nameFile){
         try(PrintWriter out = new PrintWriter(nameFile)){
+            out.println("#EPSILON " + epsilon);
+            out.println("#EPISODI " + episodes);
             for(int i = 0; i < table.length; i++){
                 for(int j = 0; j < table[i].length; j++){
                     out.print(table[i][j] + " ");
                 }
                 out.println();
             }
-            out.println("#EPSILON " + epsilon);
-            out.println("#EPISODI " + episodes);
         } 
         catch(Exception e){
             System.out.println("Errore nel salvataggio Q-table");
         }
     }
     // CARICA LA TABELLA DI APPRENDIMENTO
-    public void loadTable(String nameFile){
+   public void loadTable(String nameFile){
         File f = new File(nameFile);
-        if (!f.exists()) 
+
+        if (!f.exists()){
+            this.epsilon = 0.8;
+            this.episodes = 0;
             return;
+        }
+
         try (BufferedReader br = new BufferedReader(new FileReader(f))){
             String line;
             int i = 0;
+
             while((line = br.readLine()) != null){
-                if (line.startsWith("#EPISODI")){
-                    this.episodes = Integer.parseInt(line.split(" ")[1]);
+
+                line = line.trim();
+
+                // ignoriamo righe vuote
+                if(line.isEmpty())
+                    continue;
+
+                // EPSILON
+                if(line.startsWith("#EPSILON")){
+                    String[] parts = line.split("\\s+");
+                    if(parts.length >= 2)
+                        this.epsilon = Double.parseDouble(parts[1]);
                     continue;
                 }
-                if (line.startsWith("#EPSILON")){
-                    this.epsilon = Double.parseDouble(line.split(" ")[1]);
+
+                // EPISODI
+                if(line.startsWith("#EPISODI")){
+                    this.episodes = Integer.parseInt(line.split("\\s+")[1]);
                     continue;
                 }
+
+                // Q-table
+                String[] values = line.split("\\s+");
+
                 if(i >= table.length)
                     break;
-                String[] values = line.trim().split("\\s+");
+
                 for(int j = 0; j < values.length && j < table[i].length; j++){
                     table[i][j] = Double.parseDouble(values[j]);
                 }
+
                 i++;
             }
+
         } 
         catch(Exception e){
             System.out.println("Errore nel caricamento Q-table, si parte da zero");
+            e.printStackTrace();
             this.episodes = 0;
+            this.epsilon = 0.8;
         }
     }
 }   

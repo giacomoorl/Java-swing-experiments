@@ -73,7 +73,7 @@ public class GameController {
         if(aiAttiva && rlManager != null){
             action = rlManager.chooseAction(stateRL);
             
-            reward -= 1;  
+            reward -= 2;  
             if(action == 1) 
                 moveLeft();
             if(action == 2) 
@@ -87,7 +87,7 @@ public class GameController {
         // ===== PADDLE =====
         if (ball.rettangle().intersects(paddle.rettangle())) {
             ball.bouncePaddle(paddle);
-            reward += 20; // Reward se il paddle prende la pallina
+            reward += 25; // Reward se il paddle prende la pallina
         }
 
         // ===== MATTONI =====
@@ -100,7 +100,7 @@ public class GameController {
                     ball.reverseDirectionY();
                     state.increasesPoints(10);
 
-                    reward += 50; // Se la pallina distrugge un mattoncino
+                    reward += 10; // Se la pallina distrugge un mattoncino
                 }
             }
         }
@@ -110,16 +110,13 @@ public class GameController {
         double centerPaddle = paddle.getX() + paddle.getLength() / 2;
         double distance = Math.abs(centerBall - centerPaddle);
 
-        if (distance < 50) 
-            reward += 2;      // Reward ( Premio ) se il paddle è vicino alla pallina
-        else 
-            reward -= 2;                    // Punizione se il paddle è lontano dalla pallina
+        reward -= distance * 0.005;
 
         // ===== GAME OVER =====
         boolean lost = false;
 
         if (ball.getY() > 800) {
-            reward -= 200;   // Punizione se non prende la pallina e finisce la partita
+            reward -= 250;   // Punizione se non prende la pallina e finisce la partita
             lost = true;
         }
         

@@ -66,69 +66,73 @@ public class RewardPlotter extends JPanel {
         List<Double> dati = leggi();
         if (dati.size() < 2) return;
 
-        // PRENDE ULTIMI 200
-        int maxPoints = 200;
-        if (dati.size() > maxPoints) {
-            dati = dati.subList(dati.size() - maxPoints, dati.size());
-        }
-
-        List<Double> smooth = media(dati, 20);
+        List<Double> mediaMobile = media(dati, 20);
 
         int w = getWidth();
         int h = getHeight();
-        int margin = 40;
+        int margin = 50;
 
-        // TROVA MIN E MAX
-        double min = Collections.min(dati);
-        double max = Collections.max(dati);
-
-        if (max == min) 
-            return;
-
+        double maxAbs = Math.max( Math.abs(Collections.max(dati)), Math.abs(Collections.min(dati)));
+        System.out.println("maxAbs = " + maxAbs);
         Graphics2D g2 = (Graphics2D) g;
 
         // SFONDO
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, w, h);
-        // INFO TESTO
+        
+        // ===== LINEA ZERO (REWARD = 0) =====
+        g2.setColor(Color.DARK_GRAY);
+        g2.drawLine(margin, h / 2, w - margin, h / 2);
+        
+        // TESTO INFO
         double ultimo = dati.get(dati.size() - 1);
-        double mediaFinale = smooth.get(smooth.size() - 1);
+        double mediaFinale = mediaMobile.get(mediaMobile.size() - 1);
 
         g2.setColor(Color.WHITE);
         g2.drawString("Ultimo: " + (int)ultimo, 50, 20);
         g2.drawString("Media: " + (int)mediaFinale, 200, 20);
+        g2.drawString("Episodio: " + dati.size(), 350, 20);
+
         // ASSI
-        g2.setColor(Color.WHITE);
         g2.drawLine(margin, h - margin, w - margin, h - margin);
         g2.drawLine(margin, margin, margin, h - margin);
 
-        g2.drawString("Episodi", w / 2, h - 5);
+        g2.drawString("Episodi", w / 2, h - 10);
         g2.drawString("Reward", 5, h / 2);
 
         double stepX = (double)(w - 2 * margin) / (dati.size() - 1);
 
-        // ===== LINEA VERDE (dati reali) =====
+        // ===== TACCHETTE X =====
+        int stepLabel = Math.max(1, dati.size() / 10);
+
+        for (int i = 0; i < dati.size(); i += stepLabel) {
+            int x = (int)(margin + i * stepX);
+            g2.drawLine(x, h - margin - 5, x, h - margin + 5);
+            g2.drawString(String.valueOf(i), x - 10, h - margin + 20);
+        }
+
+        // ===== LINEA VERDE (reward reale) =====
         g2.setColor(Color.GREEN);
 
         for (int i = 1; i < dati.size(); i++) {
             int x1 = (int)(margin + (i - 1) * stepX);
             int x2 = (int)(margin + i * stepX);
 
-            int y1 = h - margin - (int)((dati.get(i - 1) - min) / (max - min) * (h - 2 * margin));
-            int y2 = h - margin - (int)((dati.get(i) - min) / (max - min) * (h - 2 * margin));
-
+            int y1 = (int)(h/2 - (dati.get(i - 1) / maxAbs) * (h/2 - margin));
+            int y2 = (int)(h/2 - (dati.get(i) / maxAbs) * (h/2 - margin));
+            
             g2.drawLine(x1, y1, x2, y2);
         }
 
-        // ===== LINEA ROSSA (media) =====
+        // ===== LINEA ROSSA (media mobile) =====
         g2.setColor(Color.RED);
 
-        for (int i = 1; i < smooth.size(); i++) {
+        for (int i = 1; i < mediaMobile.size(); i++) {
             int x1 = (int)(margin + (i - 1) * stepX);
             int x2 = (int)(margin + i * stepX);
 
-            int y1 = h - margin - (int)((smooth.get(i - 1) - min) / (max - min) * (h - 2 * margin));
-            int y2 = h - margin - (int)((smooth.get(i) - min) / (max - min) * (h - 2 * margin));
+            int y1 = (int)(h/2 - (mediaMobile.get(i - 1) / maxAbs) * (h/2 - margin));
+            int y2 = (int)(h/2 - (mediaMobile.get(i) / maxAbs) * (h/2 - margin));
 
             g2.drawLine(x1, y1, x2, y2);
         }
