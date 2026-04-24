@@ -82,7 +82,6 @@ public class GameController {
         if (isAI() && rlManager != null) {
 
             action = rlManager.chooseAction(stateRL);
-            System.out.println("Action: " + action);
 
             if (action == 1)
                 moveLeft();

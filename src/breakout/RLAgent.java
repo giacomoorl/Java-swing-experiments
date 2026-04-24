@@ -150,6 +150,7 @@ public class RLAgent {
                 // EPSILON
                 if(line.startsWith("#EPSILON")){
                     String[] parts = line.split("\\s+");
+                    System.out.println(epsilon);
                     if(parts.length >= 2)
                         this.epsilon = Double.parseDouble(parts[1]);
                     continue;

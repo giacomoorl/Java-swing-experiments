@@ -73,7 +73,7 @@ public class RewardPlotter extends JPanel {
         int margin = 50;
 
         double maxAbs = Math.max( Math.abs(Collections.max(dati)), Math.abs(Collections.min(dati)));
-        System.out.println("maxAbs = " + maxAbs);
+  
         Graphics2D g2 = (Graphics2D) g;
 
         // SFONDO

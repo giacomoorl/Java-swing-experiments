@@ -12,10 +12,6 @@ public class RLManager{
     public RLManager(RLAgent agent) {
         this.agente = agent;
     }
-    // DICE ALL'AGENTE DI IMPOSTARE EPSILON
-    /*public void setEpsilon(double e){
-        agente.setEpsilon(e);
-    }*/
     // SCEGLIE L'AZIONE DA FARE
     public int chooseAction(int stato) {
         return agente.chooseAction(stato);
