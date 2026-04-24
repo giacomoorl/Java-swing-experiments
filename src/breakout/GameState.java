@@ -10,8 +10,6 @@ public class GameState {
 
     private int points;
     private int level;
-    private boolean aiAttiva;
-   
     private final int MaxLevel = 5;
     private final int numberOfLines = 5;
     private final int numberOfColumns = 10;
@@ -20,8 +18,6 @@ public class GameState {
         System.out.println("Stato creato");
         level = 1;
         points = 0;
-        aiAttiva = false;
-
         paddle = new Paddle(750, 700);
         ball = new Ball(800, 670);
 
@@ -67,7 +63,7 @@ public class GameState {
     }
 
     public int numTotalState() {
-        return 5 * 2 * 4 * 5; 
+        return 10 * 2 * 4 * 5; 
     }
 
     // ===== GETTER =====

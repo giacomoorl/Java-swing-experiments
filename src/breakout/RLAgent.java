@@ -24,6 +24,7 @@ public class RLAgent {
     public RLAgent(int numState, int numActions){
         table = new double[numState][numActions];
         casual = new Random();
+      
         for (int i = 0; i < numState; i++)
             for (int j = 0; j < numActions; j++)
                 table[i][j] = 0.0;
@@ -64,8 +65,13 @@ public class RLAgent {
 
         episodes++; // incremento episodio
 
-        epsilon = Math.max(0.05, epsilon * 0.995);
-
+        if(episodes < 1000) {
+            epsilon = Math.max(0.1, epsilon * 0.995);
+        } 
+        else{
+            epsilon = Math.max(0.02, epsilon * 0.999);
+        }
+      
         System.out.println("Nuovo epsilon: " + epsilon);
         
         return total;
@@ -123,7 +129,8 @@ public class RLAgent {
         File f = new File(nameFile);
 
         if (!f.exists()){
-            this.epsilon = 0.8;
+            this.epsilon = 1.0;
+            System.out.println(epsilon);
             this.episodes = 0;
             return;
         }
@@ -172,7 +179,7 @@ public class RLAgent {
             System.out.println("Errore nel caricamento Q-table, si parte da zero");
             e.printStackTrace();
             this.episodes = 0;
-            this.epsilon = 0.8;
+            this.epsilon = 1.0;
         }
     }
 }   

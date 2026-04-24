@@ -38,14 +38,7 @@ public class GameLoop {
         view.repaint();
     }
 
-    // ===== METODI PER AVVIARE/FERMARE =====
-    public void runManual() {
-        controller.attivaAI(false);
-        timer.start();
-    }
-
-    public void runAI() {
-        controller.attivaAI(true);
+   public void run() {
         timer.start();
     }
 
