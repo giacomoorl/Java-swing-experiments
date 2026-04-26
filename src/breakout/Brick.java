@@ -2,11 +2,10 @@ package breakout;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-
+import java.awt.Graphics;
 /**
  * CLASSE BRICK
  */
-
 public class Brick {
     // CAMPI DATI
     private int x, y;
@@ -22,27 +21,23 @@ public class Brick {
         this.color = c;
         this.destroy = false;
     }
-
-    // METODO CHE RIRTORNA SE IL MATTONCINO È DISTRUTTO O NO 
+    // RIRTORNA SE IL MATTONCINO È DISTRUTTO O NO 
     public boolean isDestroy() { return destroy; }
-    // METODO CHE DISTRUGGE IL MATTONCINO
+    // DISTRUGGE IL MATTONCINO
     public void destroy() { destroy = true; }
-
-    // METODO CHE RESTITUISCE IL RETTANGOLO DEL MATTONCINO
+    // RESTITUISCE IL RETTANGOLO DEL MATTONCINO
     // SERVE PER CONTROLLARE LE COLLISIONI (es. con la pallina)
     public Rectangle rettangle() {
         return new Rectangle(x, y, length, height);
     }
-
-    // METODI GETTERS 
+    // GETTERS 
     public int getX() { return x; }
     public int getY() { return y; }
     public int getLength() { return length; }
     public int getHeight() { return height; }
     public Color getColor() { return color; }
-
-    // METODO CHE DICE AL MATTONCINO DI DISEGNARSI A SCHERMO
-    public void draw(java.awt.Graphics g) {
+    // DISEGNA A SCHERMO IL MATTONCINO
+    public void draw(Graphics g) {
         if (!destroy) {
             g.setColor(color);
             g.fillRect(x, y, length, height);

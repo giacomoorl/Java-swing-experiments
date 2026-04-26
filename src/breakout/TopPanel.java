@@ -5,9 +5,10 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 /*
-* CLASSE PANNELLO SUPERIORE 
+* CLASSE TOPPANEL
 */
 public class TopPanel extends JPanel {
+    // CAMPI DATI
     private JLabel labelPoints;
     private JLabel labelLevel;
     // COSTRUTTORE

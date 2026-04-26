@@ -2,9 +2,7 @@ package breakout;
 
 import javax.swing.Timer;
 /*
-* Classe motore del ciclo di gioco , da i tempi di esecuzione 
-* in particolare dice al controller di aggiornare lo stato del gioco 
-* ogni 16 ms
+* CLASSE LOOP , CHE DETTA I TEMPI DI AGGIORNAMENTO DEL GIOCO
 */
 public class GameLoop {
     // CAMPI DATI 
@@ -15,11 +13,9 @@ public class GameLoop {
     // COSTRUTTORE
     public GameLoop(GameController controller, GameView view, TopPanel top) {
         System.out.println("Loop creato");
-      
         this.controller = controller;
         this.view = view;
         this.top = top;
-
         // 16 ms ≈ 60 FPS
         timer = new Timer(16, e -> update());
     }
@@ -28,20 +24,20 @@ public class GameLoop {
     // DICE AL PANNELLO SUPERIORE DI AGGIORNARE PUNTI E LIVEELO OGNI 16 MS
     // DICE ALLA VIEW DI RISDISEGNARE LO SCHERMO DEL GIOCO
     private void update() {
-       
+        // DICE AL CONTROLLER DI AGGIORNARE IL GIOCO 
         controller.update();  
-        
-        // aggiorna punti e livello nel pannello superiore
+        // DICE AL TOPPANEL DI AGGIORNARE PUNTI E LIVELLO 
         top.updatePoints(controller.getState().getPoints());
         top.updateLevel(controller.getState().getLevel());
-     
+        // DICE ALLA VIEW DI RIDISEGNARSI , LA REPAINT AUTOMATICAMENTE INCOVA 
+        // PAINTCOMPONENT
         view.repaint();
     }
-
-   public void run() {
+    // DICE AL LOOP DI INIZIARE DARE I TEMPI DI AGGIORNAMENTO
+    public void run() {
         timer.start();
     }
-
+    // DICE AL LOOP DI FERMARE IL TEMPO DI GIOCO
     public void stop() {
         timer.stop();
     }

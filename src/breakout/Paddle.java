@@ -9,7 +9,7 @@ public class Paddle {
     private int x, y;          
     private final int length; 
     private final int height; 
-    private int speed;      
+    private double speed;      
     // COSTRUTTORE 
     public Paddle(int startX, int startY){
         this.x = startX;
@@ -31,7 +31,7 @@ public class Paddle {
             x = limitDx - length;
     }
     // RETTANGOLO PER COLLISIONI 
-    public Rectangle rettangle() {
+    public Rectangle getRettangle() {
         return new Rectangle(x, y, length, height);
     }
     // GETTER 
@@ -39,7 +39,7 @@ public class Paddle {
     public int getY() { return y; }
     public int getLength() { return length; }
     public int getHeight() { return height; }
-    public int getSpeed() { return speed; }
+    public double getSpeed() { return speed; }
     // SETTER 
     public void setX(int x){
         this.x = x;
@@ -51,7 +51,7 @@ public class Paddle {
         this.speed = v;
     }
     public void increasesSpeed(int livello){
-        speed = 25 + livello; 
+        speed = 25 + livello * 0.5; 
     }
     // DISEGNA L'ASTICELLA 
     public void draw(java.awt.Graphics g){

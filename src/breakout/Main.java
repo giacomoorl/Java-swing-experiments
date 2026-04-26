@@ -4,6 +4,7 @@ package breakout;
 */
 public class Main {
         public static void main(String[] args) {
+            // STATE , CONTOLLER E VIEW
             GameState state = new GameState();
             GameController controller = new GameController(state);
             GameView view = new GameView(state);
@@ -11,11 +12,11 @@ public class Main {
             TopPanel top = new TopPanel();
             // GAMELOOP
             GameLoop loop = new GameLoop(controller, view, top);
-            // ✅ CREA L'AI
-            int numStati = state.numTotalState();  
-            RLAgent agente = new RLAgent(numStati, 3);   
+            // ✅ AI
+            int numState = state.numTotalState();  
+            RLAgent agente = new RLAgent(numState, 3);   
             agente.loadTable("Table.txt"); 
-            // CREA IL MANAGER AI
+            // MANAGER AI
             RLManager rlManager = new RLManager(agente);
             controller.setRLManager(rlManager);
             // PANNELLO INFERIORE CON PULSANTI
@@ -27,7 +28,7 @@ public class Main {
             view.addKeyListener(input);
             view.setFocusable(true);
             view.requestFocusInWindow();
-            // CREA IL VISUALIZZATORE DEL GRAFICO DELLE REWARD
+            // VISUALIZZATORE DEL GRAFICO DELLE REWARD
             RewardPlotter plot = new RewardPlotter();
             new RewardWindow(plot);
         }

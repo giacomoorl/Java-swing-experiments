@@ -3,26 +3,27 @@ package breakout;
 import java.util.List;
 import java.io.FileWriter;
 /*
-* Classe che fa da intermediario da l'agente e il resto del sistema 
+* ClASSE CHE FA DA INTERMEDIARIO TRA L'AGENTE E IL RESTO DEL SISTEMA 
 */
 public class RLManager{
     // CAMPI DATI , RIFERIMENTO ALL'AGENTE CHE  GESTISCE
     private RLAgent agente;
+    private boolean trainer;
     // COSTRUTTORE
-    public RLManager(RLAgent agent) {
+    public RLManager(RLAgent agent){
         this.agente = agent;
     }
     // SCEGLIE L'AZIONE DA FARE
-    public int chooseAction(int stato) {
+    public int chooseAction(int stato){
         return agente.chooseAction(stato);
     }
     // IMPOSTA IL TRAINING
     public void setTraining(boolean training){
-        agente.trainer = training;
+        trainer = training;
     }
     // DICE ALL'AGENTE DI AGGIUNGERE LA REWARD E DI AGGIORNARE LA TABELLA
-    public void updateLearning(int state, int action, int reward, int newState) {
-        if (agente.trainer) {
+    public void updateLearning(int state, int action, int reward, int newState){
+        if (trainer){
             agente.addReward(reward);
             agente.updateTable(state, action, reward, newState);
         }
@@ -32,30 +33,24 @@ public class RLManager{
         return agente.getHistoricalReward();
     }
     // DICE ALL'AGENTE COSA FARE IN CASO DI GAME OVER
-    public void endEpisode() {
-        if (!agente.trainer) 
+    public void endEpisode(){
+        if(!trainer) 
             return;
-         
-        double total = agente.closeEpisode();
-        
-        System.out.println("EPISODIO: " + agente.getEpisodes() +
+         double total = agente.closeEpisode();
+         System.out.println("EPISODIO: " + agente.getEpisodes() +
                            " | epsilon: " + agente.getEpsilon() +
                            " | reward: " + total);
-        
-        try (FileWriter fw = new FileWriter("rewards.txt", true)) {
+        try(FileWriter fw = new FileWriter("rewards.txt", true)) {
             fw.write(total + "\n");
         } 
         catch(Exception e) {}
-
-        if (agente.getEpisodes() % 10 == 0) {
+        if(agente.getEpisodes() % 10 == 0){
             agente.saveTable("Table.txt");
         }
-       
-        if (agente.getEpisodes() >= agente.getMaxEpisodes()) {
+       if (agente.getEpisodes() >= agente.getMaxEpisodes()){
             System.out.println("TRAINING FINITO!");
-
             agente.saveTable("Table.txt");
-            agente.trainer = false;
+            trainer=false;
         }
     }
 }

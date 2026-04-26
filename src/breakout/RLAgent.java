@@ -11,11 +11,13 @@ import java.util.ArrayList;
 public class RLAgent {
     // CAMPI DATI
     private double[][] table;
-    private final double alfa = 0.1;
+    // COEFFICIENTE D'APPRENDIMENTO
+    private final double alfa = 0.1; 
+    // COEFFICIENTE CHE PESA LE RICOMPENSE FUTURE
     private final double gamma = 0.9;
+    // EPSILON , VARIABILE PER LA CASUALITÀ
     private double epsilon;
     private List<Double> historicalReward = new ArrayList<>();
-    public boolean trainer = true;
     private final Random casual;
     private int episodes = 0;
     private int maxEpisodes = 5000;
@@ -24,10 +26,11 @@ public class RLAgent {
     public RLAgent(int numState, int numActions){
         table = new double[numState][numActions];
         casual = new Random();
-      
         for (int i = 0; i < numState; i++)
             for (int j = 0; j < numActions; j++)
                 table[i][j] = 0.0;
+         // INIZIALIZZA EPSILON A 1
+         epsilon = 1.0;
     }
     // SALVA LA RICOMPENSA DI OGNI EPISODIO
     public void saveRewardEpisode(double r){
@@ -62,18 +65,15 @@ public class RLAgent {
    public double closeEpisode(){
         double total = rewardEpisode;
         rewardEpisode = 0;
-
-        episodes++; // incremento episodio
-
+        // INCREMENTA EPISODIO
+        episodes++; 
         if(episodes < 1000) {
             epsilon = Math.max(0.1, epsilon * 0.995);
         } 
         else{
             epsilon = Math.max(0.02, epsilon * 0.999);
         }
-      
         System.out.println("Nuovo epsilon: " + epsilon);
-        
         return total;
     }
     // SCEGLIE L'AZIONE DA FARE IN BASE ALLO STATO
@@ -87,25 +87,22 @@ public class RLAgent {
             int best = 0;
             double max = table[state][0];
             for (int i = 1; i < table[state].length; i++)
-                if (table[state][i] > max) {
+                if (table[state][i] > max){
                     max = table[state][i];
                     best = i;
                 }
             return best;
         }
     }
-   
     // AGGIORNA LA Q-TABLE IN BASE ALLA RICOMPENSA OTTENUTA
     // PIÙ UNA SCELTA È BUONA → PIÙ AUMENTA IL SUO VALORE
     public void updateTable(int state, int action, int reward, int newState){
         if (state < 0 || newState < 0 || state >= table.length || newState >= table.length)
             return;
-
         double maxFuturo = table[newState][0];
         for (int i = 1; i < table[newState].length; i++)
             if (table[newState][i] > maxFuturo)
                 maxFuturo = table[newState][i];
-
         table[state][action] += alfa * (reward + gamma * maxFuturo - table[state][action]);
     }
     // SALVA LA TABELLA DI APPRENDIMENTO
@@ -127,54 +124,39 @@ public class RLAgent {
     // CARICA LA TABELLA DI APPRENDIMENTO
    public void loadTable(String nameFile){
         File f = new File(nameFile);
-
-        if (!f.exists()){
-            this.epsilon = 1.0;
-            System.out.println(epsilon);
+        if(!f.exists()){
             this.episodes = 0;
             return;
         }
-
-        try (BufferedReader br = new BufferedReader(new FileReader(f))){
+        try(BufferedReader br = new BufferedReader(new FileReader(f))){
             String line;
             int i = 0;
-
             while((line = br.readLine()) != null){
-
                 line = line.trim();
-
-                // ignoriamo righe vuote
+                // IGNORA LE RIGHE VUOTE
                 if(line.isEmpty())
                     continue;
-
-                // EPSILON
+                // SE LA TABELLA INIZIA CON EPSILON
                 if(line.startsWith("#EPSILON")){
                     String[] parts = line.split("\\s+");
                     System.out.println(epsilon);
                     if(parts.length >= 2)
-                        this.epsilon = Double.parseDouble(parts[1]);
-                    continue;
+                        continue;
                 }
-
-                // EPISODI
+                // SE LA TABELLA INIZIA CON EPISODI
                 if(line.startsWith("#EPISODI")){
                     this.episodes = Integer.parseInt(line.split("\\s+")[1]);
                     continue;
                 }
-
-                // Q-table
+                // QTABLE
                 String[] values = line.split("\\s+");
-
                 if(i >= table.length)
                     break;
-
                 for(int j = 0; j < values.length && j < table[i].length; j++){
                     table[i][j] = Double.parseDouble(values[j]);
                 }
-
                 i++;
             }
-
         } 
         catch(Exception e){
             System.out.println("Errore nel caricamento Q-table, si parte da zero");
