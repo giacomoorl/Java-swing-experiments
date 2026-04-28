@@ -13,9 +13,13 @@ public class RLManager{
     public RLManager(RLAgent agent){
         this.agente = agent;
     }
-    // SCEGLIE L'AZIONE DA FARE
+    // SCEGLIE L'AZIONE DA FARE ( NEL TRAINING )
     public int chooseAction(int stato){
         return agente.chooseAction(stato);
+    }
+    // SCEGLIE L?AZIONE MIGLIORE DA FARE ( NEL GIOCO )
+    public int chooseBestAction(int stato){
+        return agente.chooseBestAction(stato);
     }
     // IMPOSTA IL TRAINING
     public void setTraining(boolean training){

@@ -30,7 +30,7 @@ public class RLAgent {
             for (int j = 0; j < numActions; j++)
                 table[i][j] = 0.0;
          // INIZIALIZZA EPSILON A 1
-         epsilon = 1.0;
+         epsilon = 0.8;
     }
     // SALVA LA RICOMPENSA DI OGNI EPISODIO
     public void saveRewardEpisode(double r){
@@ -65,20 +65,16 @@ public class RLAgent {
    public double closeEpisode(){
         double total = rewardEpisode;
         rewardEpisode = 0;
-        // INCREMENTA EPISODIO
+        // AUMENTA EPISODIO
         episodes++; 
-        if(episodes < 1000) {
-            epsilon = Math.max(0.1, epsilon * 0.995);
-        } 
-        else{
-            epsilon = Math.max(0.02, epsilon * 0.999);
-        }
+        // DECRESCE EPSILON
+        epsilon = Math.max(0.02, 0.8 - (double)episodes / maxEpisodes);
         System.out.println("Nuovo epsilon: " + epsilon);
         return total;
     }
     // SCEGLIE L'AZIONE DA FARE IN BASE ALLO STATO
     // A VOLTE FA MOSSE RANDOM (ESPLORA)
-    // A VOLTE SCEGLIE LA MIGLIORE (USA QUELLO CHE HA IMPARATO
+    // A VOLTE SCEGLIE LA MIGLIORE ( USA QUELLO CHE HA IMPARATO )
     public int chooseAction(int state){
         if (state < 0 || state >= table.length) return 0;
         if (casual.nextDouble() < epsilon)
@@ -94,9 +90,28 @@ public class RLAgent {
             return best;
         }
     }
+    // SCEGLIE L'AZIONE DA FARE IN BASE ALLO STATO
+    // USA SOLO QUELLO CHE HA IMPARATO
+    public int chooseBestAction(int state) {
+        double[] qValues = table[state];
+        int bestAction = 0;
+        double max = qValues[0];
+        for (int i = 1; i < qValues.length; i++) {
+            if (qValues[i] > max) {
+                max = qValues[i];
+                bestAction = i;
+            }
+        }
+        return bestAction;
+    }
     // AGGIORNA LA Q-TABLE IN BASE ALLA RICOMPENSA OTTENUTA
     // PIÙ UNA SCELTA È BUONA → PIÙ AUMENTA IL SUO VALORE
     public void updateTable(int state, int action, int reward, int newState){
+        // SE NEWSTATE == -1 , NIENTE REWARD FUTUTRO
+        if (newState == -1) {
+            table[state][action] += alfa * (reward - table[state][action]);
+            return;
+        }
         if (state < 0 || newState < 0 || state >= table.length || newState >= table.length)
             return;
         double maxFuturo = table[newState][0];
@@ -108,7 +123,6 @@ public class RLAgent {
     // SALVA LA TABELLA DI APPRENDIMENTO
     public void saveTable(String nameFile){
         try(PrintWriter out = new PrintWriter(nameFile)){
-            out.println("#EPSILON " + epsilon);
             out.println("#EPISODI " + episodes);
             for(int i = 0; i < table.length; i++){
                 for(int j = 0; j < table[i].length; j++){
@@ -136,13 +150,6 @@ public class RLAgent {
                 // IGNORA LE RIGHE VUOTE
                 if(line.isEmpty())
                     continue;
-                // SE LA TABELLA INIZIA CON EPSILON
-                if(line.startsWith("#EPSILON")){
-                    String[] parts = line.split("\\s+");
-                    System.out.println(epsilon);
-                    if(parts.length >= 2)
-                        continue;
-                }
                 // SE LA TABELLA INIZIA CON EPISODI
                 if(line.startsWith("#EPISODI")){
                     this.episodes = Integer.parseInt(line.split("\\s+")[1]);

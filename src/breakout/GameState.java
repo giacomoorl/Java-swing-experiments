@@ -59,7 +59,7 @@ public class GameState {
     }
     // RITORNA IL NUMERO DI STATI
     public int numTotalState() {
-        return 10 * 2 * 4 * 5; 
+        return 10 * 5 * 2 * 4 * 5; 
     }
     // GETTERS
     public Paddle getPaddle(){
