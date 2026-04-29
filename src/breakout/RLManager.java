@@ -11,6 +11,7 @@ public class RLManager{
     private boolean trainer;
     // COSTRUTTORE
     public RLManager(RLAgent agent){
+        System.out.println("RLManager creato");
         this.agente = agent;
     }
     // SCEGLIE L'AZIONE DA FARE ( NEL TRAINING )

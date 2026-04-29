@@ -13,6 +13,7 @@ class BottomPanel extends JPanel {
     private RLManager rlManager;
     // COSTRUTTORE
     public BottomPanel(GameLoop loop, GameView view, GameController controller, RLManager rlManager){
+        System.out.println("BottomPanel creato");
         setBackground(Color.DARK_GRAY);
         // ISTANZIA L'RLMANAGER
         this.rlManager = rlManager;
@@ -24,6 +25,7 @@ class BottomPanel extends JPanel {
         // CASO IN CUI L'UTENTE PREME PLAY
         run.addActionListener(e -> {
             controller.setMode(GameController.Mode.HUMAN);
+            controller.startNewGame(); 
             rlManager.setTraining(false);
             loop.run();
             view.requestFocusInWindow();
@@ -31,6 +33,7 @@ class BottomPanel extends JPanel {
         //CASO IN CUI L'UTENTE PREME TRAINING 
         ai.addActionListener(e -> {
             controller.setMode(GameController.Mode.AI_TRAINING);
+            controller.startNewGame(); 
             rlManager.setTraining(true);
             loop.run();
             view.requestFocusInWindow();
@@ -43,6 +46,7 @@ class BottomPanel extends JPanel {
         playAI.addActionListener(e -> {
             controller.setMode(GameController.Mode.AI_PLAY);
             rlManager.setTraining(false);
+            controller.startNewGame(); 
             loop.run();
             view.requestFocusInWindow();
         });

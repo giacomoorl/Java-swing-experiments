@@ -26,6 +26,9 @@ public class GameLoop {
     private void update() {
         // DICE AL CONTROLLER DI AGGIORNARE IL GIOCO 
         controller.update();  
+          if(controller.isGameOver()) {
+                stop(); 
+          }
         // DICE AL TOPPANEL DI AGGIORNARE PUNTI E LIVELLO 
         top.updatePoints(controller.getState().getPoints());
         top.updateLevel(controller.getState().getLevel());

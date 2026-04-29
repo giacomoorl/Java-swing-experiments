@@ -45,7 +45,7 @@ public class Ball {
         }
         dy = -Math.abs(dy); 
     }
-    // METODO PER DIRE ALLA PALLINA COSA FARE IN CASO DI RIMBALZO SUI MURI
+    // DICE ALLA BALL COSA FARE IN CASO DI RIMBALZO SUI MURI
     public void bounceWall(int panelWidth) {
         if(x < 0) 
         { 
@@ -109,14 +109,14 @@ public class Ball {
     public Rectangle getRettangle() {
         return new java.awt.Rectangle((int)x, (int)y, diameter, diameter);
     }
-    // METODO PER DIRE ALLA PALLINA DI DISEGNARSI A SCHERMO
+    // DISEGNA LA BALL A SCHERMO
     public void draw(java.awt.Graphics g) {
         g.setColor(java.awt.Color.WHITE);
         g.fillOval((int)x, (int)y, diameter, diameter);
     }
-    // METODO PER DIRE ALLA PALLINA DI AUMENTARE LA SUA VELOCITÀ AD OGNI LIVELLO
+    // AUMENTA LA VELOCITÀ DELLA BALL AD OGNI LIVELLO
     public void increasesSpeed(int level) {
-        double newSpeed = 3 + level * 0.5;
+        double newSpeed = 3 * Math.pow(1.08, level);;
         dx = dx > 0 ? newSpeed : -newSpeed;
         dy = dy > 0 ? newSpeed : -newSpeed;
     }

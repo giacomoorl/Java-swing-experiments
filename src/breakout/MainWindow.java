@@ -8,8 +8,8 @@ import java.awt.BorderLayout;
 public class MainWindow extends JFrame {
     // COSTRUTTORE
     public MainWindow(GameView view, TopPanel top, BottomPanel bottom) {
-
         super("Breakout");
+        System.out.println("MainWindow creata");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 

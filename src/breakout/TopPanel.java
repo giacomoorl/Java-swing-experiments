@@ -13,6 +13,7 @@ public class TopPanel extends JPanel {
     private JLabel labelLevel;
     // COSTRUTTORE
     public TopPanel() {
+        System.out.println("Panel creato");
         setBackground(Color.BLUE);
 
         labelPoints = new JLabel("Punti: 0");

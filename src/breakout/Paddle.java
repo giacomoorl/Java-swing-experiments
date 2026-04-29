@@ -47,11 +47,11 @@ public class Paddle {
     public void setY(int y){
         this.y = y; 
     }
-    public void setSpeed(int v){ 
+    public void setSpeed(double v){ 
         this.speed = v;
     }
     public void increasesSpeed(int livello){
-        speed = 25 + livello * 0.5; 
+        speed = Math.max(20, 25 - livello * 0.3);
     }
     // DISEGNA L'ASTICELLA 
     public void draw(java.awt.Graphics g){

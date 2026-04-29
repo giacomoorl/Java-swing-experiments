@@ -21,7 +21,8 @@ import java.util.List;
 */
 public class RewardPlotter extends JPanel {
     // COSTRUTTORE
-    public RewardPlotter() {
+    public RewardPlotter(){
+        System.out.println("RewardPlot creato");
         setPreferredSize(new Dimension(800, 300));
         setBackground(Color.BLACK);
         // AGGIORNA OGNI 1000 MS ( 1 SECONDO )

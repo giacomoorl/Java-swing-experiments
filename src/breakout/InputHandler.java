@@ -11,7 +11,8 @@ public class InputHandler implements KeyListener {
     private GameController controller;
     private GameView view;
     // COSTRUTTORE
-    public InputHandler(GameController controller, GameView view) {
+    public InputHandler(GameController controller, GameView view){
+        System.out.println("InputHandler creato");
         this.controller = controller;
         this.view = view;
     }

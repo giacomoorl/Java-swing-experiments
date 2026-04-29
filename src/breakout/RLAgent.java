@@ -24,6 +24,7 @@ public class RLAgent {
     private double rewardEpisode = 0;
     // COSTRUTTORE , INIZIALIZZA TABELLA DI APPRENDIMENTO A ZERO
     public RLAgent(int numState, int numActions){
+        System.out.println("RLAgent creato");
         table = new double[numState][numActions];
         casual = new Random();
         for (int i = 0; i < numState; i++)
@@ -137,6 +138,7 @@ public class RLAgent {
     }
     // CARICA LA TABELLA DI APPRENDIMENTO
    public void loadTable(String nameFile){
+       System.out.println("Table caricata");
         File f = new File(nameFile);
         if(!f.exists()){
             this.episodes = 0;
@@ -169,7 +171,7 @@ public class RLAgent {
             System.out.println("Errore nel caricamento Q-table, si parte da zero");
             e.printStackTrace();
             this.episodes = 0;
-            this.epsilon = 1.0;
+            this.epsilon = 0.8;
         }
     }
 }   

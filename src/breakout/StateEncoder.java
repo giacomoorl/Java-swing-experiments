@@ -9,11 +9,11 @@ public class StateEncoder {
         Ball ball = state.getBall();
         Paddle paddle = state.getPaddle();
         // CALCOLA IN CHE RIGA È LA PALLA 
-        int row = (int)(ball.getY() / (900.0 / 5));
-        row = Math.max(0, Math.min(4, row));
+        int row = (int)(ball.getY() / (900.0 / 3));
+        row = Math.max(0, Math.min(2, row));
         // CALCOLA IN CHE COLONNA È LA BALL
-        int col = (int)(ball.getX() / (1600.0 / 10));
-        col = Math.max(0, Math.min(9, col));
+        int col = (int)(ball.getX() / (1600.0 / 6));
+        col = Math.max(0, Math.min(5, col));
         // CALCOLA LA DIREZIONE DELLA BALL
         int directionY;
         if(ball.getDY() > 0)
@@ -48,7 +48,7 @@ public class StateEncoder {
         else 
             rel = 4;
       
-        return (((((col * 5 + row) * 2 + directionY) * 4 + velX) * 5 + rel));
+        return (((((col * 3 + row) * 2 + directionY) * 4 + velX) * 5 + rel));
     }
 }
 
