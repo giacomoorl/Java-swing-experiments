@@ -8,6 +8,7 @@ import java.awt.Graphics;
 */
 public class GameView extends JPanel {
     // CAMPI DATI
+    int width,height;
     private GameState state;
     // COSTRUTTORE
     public GameView(GameState state) {

@@ -4,6 +4,7 @@ package breakout;
 */
 public class GameController{
     // CAMPI DATI 
+  
     private GameState state;
     private RLManager rlManager;
     private StateEncoder encoder;
@@ -52,27 +53,31 @@ public class GameController{
         this.rlManager = rlManager;
     }
     // MUOVE PADDLE A SINISTRA
-    public void moveLeft() {
+    public void moveLeft(){
         state.getPaddle().moveSx();
     }
     // MUOVE PADDLE A DESTRA 
-    public void moveRight(int limit) {
+    public void moveRight(int limit){
         state.getPaddle().moveDx(limit);
     }
     // SI FA DARE STATO
-    public GameState getState() {
+    public GameState getState(){
         return state;
     }
     // CONTROLLA SE I MATTONCINI SONO DISTRUTTI TUTTI
-    private boolean allBricks(Brick[][] bricks) {
-        for (Brick[] row : bricks)
-            for (Brick b : row)
-                if (!b.isDestroy())
+   private boolean allBricks(Brick[][] bricks) {
+        for (int i = 0; i < bricks.length; i++) {
+            for (int j = 0; j < bricks[i].length; j++) {
+                if (!bricks[i][j].isDestroy()) {
                     return false;
+                }
+            }
+        }
         return true;
     }
     // AGGIORNA IL GIOCO
     public void update() {
+       
         Ball ball = state.getBall();
         Paddle paddle = state.getPaddle();
         if (isHuman()) {
@@ -85,6 +90,7 @@ public class GameController{
         Brick[][] bricks = state.getBricks();
 
         int stateRL = encoder.encode(state);
+      
         int action = 0;
         int reward = 0;
       
@@ -101,25 +107,26 @@ public class GameController{
             else if(action == 2)
                 moveRight(LENGTH);
         }
+     
         // MUOVE BALL E CONTROLLA SE LA BALL COLLIDE WITH WALL
         ball.move();
         ball.bounceWall(LENGTH);
-
+        
         // CONTROLLA LA COLLISIONE TRA PADDLE E BALL
         if (ball.getRettangle().intersects(paddle.getRettangle())) {
             ball.bouncePaddle(paddle);
-            reward += 5;
+            reward += 10;
         }
         // CALCOLA LA COLLISIONE WITH BRICKS
         for (int i = 0; i < bricks.length; i++) {
             for (int j = 0; j < bricks[i].length; j++) {
                 Brick brick = bricks[i][j];
-
+                // REWARD SE LA BALL COLPISCE UN BRICK
                 if (!brick.isDestroy() && ball.getRettangle().intersects(brick.rettangle())) {
                     brick.destroy();
                     ball.reverseDirectionY();
                     state.increasesPoints(10);
-                    reward += 60;
+                    reward += 100;
                 }
             }
         }
@@ -128,20 +135,24 @@ public class GameController{
         double centerPaddle = paddle.getX() + paddle.getLength() / 2;
         double distance = Math.abs(centerBall - centerPaddle);
         // PUNIZIONE SE IL PADDLE E LA BALL SONO DISTANTI
-        reward -= Math.min(5, distance * 0.01);
+        if(distance>120)
+            reward -= 1;
         // PUNIZIONE SE PERDE LA PARTITA L'AI
         boolean lost = false;
-        if (ball.getY() > 800) {
+      
+        if(ball.getY() > 800) {
             reward -= 200;
             lost = true;
         }
-        int newState = encoder.encode(state);
+      
+        int newStateRL = encoder.encode(state);
+     
         // 🧠 LEARNING SOLO IN TRAINING
         if (isAITraining()) {
             if (lost)
                 rlManager.updateLearning(stateRL, action, reward, -1);
             else
-                rlManager.updateLearning(stateRL, action, reward, newState);
+                rlManager.updateLearning(stateRL, action, reward, newStateRL);
         }
         // FINE PARTITA
         if (lost) {
@@ -164,7 +175,7 @@ public class GameController{
         if (allBricks(bricks)) {
             state.nextLevel();
             ball.increasesSpeed(state.getLevel());
-            reward += 120;
+            reward += 200;
         }
     }
 }
