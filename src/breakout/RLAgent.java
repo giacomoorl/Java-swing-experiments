@@ -30,7 +30,7 @@ public class RLAgent {
         for (int i = 0; i < numState; i++)
             for (int j = 0; j < numActions; j++)
                 table[i][j] = 0.0;
-         // INIZIALIZZA EPSILON A 1
+         // INIZIALIZZA EPSILON A 0.8
          epsilon = 0.8;
     }
     // SALVA LA RICOMPENSA DI OGNI EPISODIO
@@ -77,10 +77,11 @@ public class RLAgent {
     // A VOLTE FA MOSSE RANDOM (ESPLORA)
     // A VOLTE SCEGLIE LA MIGLIORE ( USA QUELLO CHE HA IMPARATO )
     public int chooseAction(int state){
-        if (state < 0 || state >= table.length) return 0;
+        if (state < 0 || state >= table.length) 
+            return 0;
         if (casual.nextDouble() < epsilon)
             return casual.nextInt(table[state].length);
-        else {
+        else{
             int best = 0;
             double max = table[state][0];
             for (int i = 1; i < table[state].length; i++)
@@ -108,11 +109,7 @@ public class RLAgent {
     // AGGIORNA LA Q-TABLE IN BASE ALLA RICOMPENSA OTTENUTA
     // PIÙ UNA SCELTA È BUONA → PIÙ AUMENTA IL SUO VALORE
     public void updateTable(int state, int action, int reward, int newState){
-        // SE NEWSTATE == -1 , NIENTE REWARD FUTUTRO
-        if (newState == -1) {
-            table[state][action] += alfa * (reward - table[state][action]);
-            return;
-        }
+        
         if (state < 0 || newState < 0 || state >= table.length || newState >= table.length)
             return;
         double maxFuturo = table[newState][0];
@@ -138,7 +135,7 @@ public class RLAgent {
     }
     // CARICA LA TABELLA DI APPRENDIMENTO
    public void loadTable(String nameFile){
-       System.out.println("Table caricata");
+        System.out.println("Table caricata");
         File f = new File(nameFile);
         if(!f.exists()){
             this.episodes = 0;

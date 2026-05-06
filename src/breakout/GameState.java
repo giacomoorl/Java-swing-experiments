@@ -1,20 +1,24 @@
 package breakout;
+
 /*
 * CLASSE GAMESTATE
 */
-public class GameState {
+public class GameState{
     // CAMPI DATI 
     private Paddle paddle;
     private Ball ball;
     private Brick[][] bricks;
+    
     private int points;
     private int level;
     private final int MaxLevel = 5;
     private final int numberOfLines = 5;
     private final int numberOfColumns = 10;
+  
     // COSTRUTTORE
     public GameState() {
         System.out.println("Stato creato");
+        
         // INIZIALIZZA IL GIOCO AL LIVELLO 1 E I POINTS A ZERO
         level = 1;
         points = 0;
@@ -47,7 +51,7 @@ public class GameState {
         }
     }
     //RIPRISTINA IL GIOCO ALLO STATO INIZIALE
-    public void reset() {
+    public void reset(){
         paddle.setX(750);
         paddle.setY(700);
         ball.setPosition(800, 670);
@@ -56,10 +60,7 @@ public class GameState {
         createBricks();
         points = 0;
         level = 1;
-    }
-    // RITORNA IL NUMERO DI STATI
-    public int numTotalState() {
-        return 49; 
+        
     }
     // GETTERS
     public Paddle getPaddle(){

@@ -4,48 +4,42 @@ package breakout;
 */
 public class GameController{
     // CAMPI DATI 
-  
+    int reward , action, stateRL , newStateRL;
+    boolean lost, human, aiTraining, aiPlay;
     private GameState state;
     private RLManager rlManager;
     private StateEncoder encoder;
-    private boolean gameOver;
+    private GameLoop loop;
     private static final int LENGTH = 1600;
-    enum Mode{
-        HUMAN,
-        AI_TRAINING,
-        AI_PLAY
-    }
-    private Mode mode = Mode.HUMAN;
-    // COSTRUTTORE 
+   
     public GameController(GameState state) {
         System.out.println("Controller creato");
         this.state = state;
         this.encoder = new StateEncoder();
+        this.reward=0;
+        this.stateRL=0;
+        this.newStateRL=0;
+        this.action=0;
+        this.lost=false;
+        this.aiPlay=false;
+        this.aiTraining=false;
+        this.human=false;
+        
     }
-    // INIZIA UNA NUOVA PARTITA
-    public void startNewGame() {
-        gameOver = false;
-        state.reset(); 
+    // IMPOSTA IL LOOP PER FERMARE IL TEMPO SE FINISCE LA PARTITA L'UTENTE UMANO
+    public void setLoop(GameLoop loop){
+        this.loop = loop;
     }
-    // IMPOSTA LA MODALITÀ DI GIOCO
-    public void setMode(Mode m) {
-        this.mode = m;
+    // IMPOSTA IL GIOCATORE , SE UMANO O ARTIFICIALE E SE IN ADDESTRAMNETO 
+    // O GIOCO VERO E PROPRIO
+    public void setHuman(){
+        human=true;
     }
-    // CONTROLLA SE STA GIOCANDO L'UMANO
-    public boolean isHuman() {
-        return mode == Mode.HUMAN;
+    public void setAITraining(){
+        aiTraining=true;
     }
-    // CONTROLLA SE L'AI SI STA ALLENANDO
-    public boolean isAITraining() {
-        return mode == Mode.AI_TRAINING;
-    }
-    // CONTROLLA SE STA GIOCANDO L'AI
-    public boolean isAIPlay() {
-        return mode == Mode.AI_PLAY;
-    }
-    // CONTROLLA SE LA PARTITA È FINITA
-    public boolean isGameOver(){
-        return gameOver;
+    public void setAIPlay(){
+        aiPlay=true;
     }
     // IMPOSTA L'RLMANAGER
     public void setRLManager(RLManager rlManager){
@@ -76,106 +70,131 @@ public class GameController{
         return true;
     }
     // AGGIORNA IL GIOCO
-    public void update() {
+    public void update(){
        
         Ball ball = state.getBall();
         Paddle paddle = state.getPaddle();
-        if (isHuman()) {
-            paddle.setSpeed(25); 
-        } 
-        else if (isAITraining() || isAIPlay()) {
-            paddle.increasesSpeed(state.getLevel());
-        } 
-     
         Brick[][] bricks = state.getBricks();
-
-        int stateRL = encoder.encode(state);
-      
-        int action = 0;
-        int reward = 0;
-      
-        // SCELTA AZIONE (AI)
-        if (isAITraining()) {
-            action = rlManager.chooseAction(stateRL);
-        }
-        else if(isAIPlay()){
-                action = rlManager.chooseBestAction(stateRL); // NO random 
-        }
-        if(isAITraining() || isAIPlay()) {
-            if (action == 1)
-                moveLeft();
-            else if(action == 2)
-                moveRight(LENGTH);
-        }
-     
-        // MUOVE BALL E CONTROLLA SE LA BALL COLLIDE WITH WALL
+        // MUOVE LA BALL
         ball.move();
+        // CONTROLLA SE LA BALL COLLIDE COI MURI DEL GIOCO
         ball.bounceWall(LENGTH);
-        
-        // CONTROLLA LA COLLISIONE TRA PADDLE E BALL
-        if (ball.getRettangle().intersects(paddle.getRettangle())) {
-            ball.bouncePaddle(paddle);
-            reward += 10;
-        }
-        // CALCOLA LA COLLISIONE WITH BRICKS
-        for (int i = 0; i < bricks.length; i++) {
-            for (int j = 0; j < bricks[i].length; j++) {
-                Brick brick = bricks[i][j];
-                // REWARD SE LA BALL COLPISCE UN BRICK
-                if (!brick.isDestroy() && ball.getRettangle().intersects(brick.rettangle())) {
-                    brick.destroy();
-                    ball.reverseDirectionY();
-                    state.increasesPoints(10);
-                    reward += 100;
+        // INIZIO SEZIONE GIOCA UMANO
+        if(human){
+             for (int i = 0; i < bricks.length; i++) {
+                for (int j = 0; j < bricks[i].length; j++) {
+                    Brick brick = bricks[i][j];
+                    if(!brick.isDestroy()){
+                        if(ball.getX() + ball.getDiameter() >= brick.getX() &&
+                            ball.getX() <= brick.getX() + brick.getLength() &&
+                            ball.getY() + ball.getDiameter() >= brick.getY() &&
+                            ball.getY() <= brick.getY() + brick.getHeight()) 
+                        {
+                            brick.destroy();
+                            ball.reverseDirectionY();
+                            state.increasesPoints(10);
+                            reward += 40;
+                            System.out.println("preso mattone gioco umano");
+                            break; 
+                        }
+                    }
                 }
             }
         }
-        // CALCOLA LA DISTANZA TRA IL PADDLE E LA BALL
-        double centerBall = ball.getX() + ball.getDiameter() / 2.0;
-        double centerPaddle = paddle.getX() + paddle.getLength() / 2;
-        double distance = Math.abs(centerBall - centerPaddle);
-        // PUNIZIONE SE IL PADDLE E LA BALL SONO DISTANTI
-        if(distance>120)
-            reward -= 1;
-        // PUNIZIONE SE PERDE LA PARTITA L'AI
-        boolean lost = false;
-      
-        if(ball.getY() > 800) {
-            reward -= 200;
-            lost = true;
-        }
-      
-        int newStateRL = encoder.encode(state);
-     
-        // 🧠 LEARNING SOLO IN TRAINING
-        if (isAITraining()) {
-            if (lost)
-                rlManager.updateLearning(stateRL, action, reward, -1);
-            else
-                rlManager.updateLearning(stateRL, action, reward, newStateRL);
-        }
-        // FINE PARTITA
-        if (lost) {
-            if (isHuman()){
-                gameOver = true;
-                state.reset();
-                return;
+        // FINE SEZIONE UMANO , INIZIO SEZIONE TRAINING AI
+        if(aiTraining){
+            stateRL = encoder.encode(state);
+            System.out.println("reward iniziale "+reward);
+            action = rlManager.chooseAction(stateRL);
+            if(action == 1)
+                moveLeft();
+            if(action == 2)
+                moveRight(LENGTH);
+            for (int i = 0; i < bricks.length; i++) {
+                for (int j = 0; j < bricks[i].length; j++) {
+                    Brick brick = bricks[i][j];
+                    if(!brick.isDestroy()){
+                        if(ball.getX() + ball.getDiameter() >= brick.getX() &&
+                            ball.getX() <= brick.getX() + brick.getLength() &&
+                            ball.getY() + ball.getDiameter() >= brick.getY() &&
+                            ball.getY() <= brick.getY() + brick.getHeight()) 
+                        {
+                            brick.destroy();
+                            ball.reverseDirectionY();
+                            state.increasesPoints(10);
+                            reward += 40;
+                            System.out.println("preso mattone addestrando AI" + reward);
+                            break; 
+                        }
+                    }
+                }
             }
-            if(isAITraining()){
+            // CALCOLA NUOVO STATO 
+            newStateRL = encoder.encode(state);
+            // LIVELLO COMPLETATO
+            if(allBricks(bricks)){
+                state.nextLevel();
+                ball.increasesSpeed(state.getLevel());
+                reward += 50;
+                System.out.println("distrutto tutto " + reward + "  ");
+            }
+            rlManager.updateLearning(stateRL, action, reward, newStateRL);
+        }
+        // FINE SEZIONE AI TRAINING , INIZIO SEZIONE GIOCA AI
+        if(aiPlay){
+            action = rlManager.chooseBestAction(stateRL); 
+            if(action == 1)
+                moveLeft();
+            if(action == 2)
+                moveRight(LENGTH);
+             for (int i = 0; i < bricks.length; i++) {
+                for (int j = 0; j < bricks[i].length; j++) {
+                    Brick brick = bricks[i][j];
+                    if(!brick.isDestroy()){
+                        if(ball.getX() + ball.getDiameter() >= brick.getX() &&
+                            ball.getX() <= brick.getX() + brick.getLength() &&
+                            ball.getY() + ball.getDiameter() >= brick.getY() &&
+                            ball.getY() <= brick.getY() + brick.getHeight()) 
+                        {
+                            brick.destroy();
+                            ball.reverseDirectionY();
+                            state.increasesPoints(10);
+                            System.out.println("preso mattone gioca AI");
+                            break; 
+                        }
+                    }
+                }
+            }
+            if(allBricks(bricks)){
+                state.nextLevel();
+                ball.increasesSpeed(state.getLevel());
+                System.out.println("distrutto tutto gioca AI");
+            }
+         }
+        // CONTROLLA FINE PARTITA
+         if(ball.getY() > 800)
+            lost = true;
+            
+        // CHIUDE LA PARTITA IN BASE A CHI STA GIOCANDO
+        if(lost){
+            if(human){
+                state.reset();
+                loop.stop();
+                lost = false;
+                System.out.println("persa partita umano");
+            }
+            else if(aiTraining){
+                reward -= 50;
                 rlManager.endEpisode();
                 state.reset();
-                return;
+                lost = false;
+                System.out.println("persa partita aiTraining");
             }
-            if(isAIPlay()) {
+            else if(aiPlay){
                 state.reset();
-                return;
+                lost = false;
+                System.out.println("persa partita aiPlay");
             }
-        }
-        // LIVELLO COMPLETATO
-        if (allBricks(bricks)) {
-            state.nextLevel();
-            ball.increasesSpeed(state.getLevel());
-            reward += 200;
         }
     }
 }

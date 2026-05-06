@@ -30,10 +30,6 @@ public class Paddle {
         if (x + length > limitDx) 
             x = limitDx - length;
     }
-    // RETTANGOLO PER COLLISIONI 
-    public Rectangle getRettangle() {
-        return new Rectangle(x, y, length, height);
-    }
     // GETTER 
     public int getX() { return x; }
     public int getY() { return y; }
@@ -47,11 +43,9 @@ public class Paddle {
     public void setY(int y){
         this.y = y; 
     }
-    public void setSpeed(double v){ 
-        this.speed = v;
-    }
-    public void increasesSpeed(int livello){
-        speed = Math.max(20, 25 - livello * 0.3);
+    public void increasesSpeed(int level){
+        double baseSpeed = 25;
+        speed = baseSpeed + level * 2;
     }
     // DISEGNA L'ASTICELLA 
     public void draw(java.awt.Graphics g){

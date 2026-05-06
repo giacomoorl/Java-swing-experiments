@@ -18,7 +18,7 @@ public class RLManager{
     public int chooseAction(int stato){
         return agente.chooseAction(stato);
     }
-    // SCEGLIE L?AZIONE MIGLIORE DA FARE ( NEL GIOCO )
+    // SCEGLIE L'AZIONE MIGLIORE DA FARE ( NEL GIOCO )
     public int chooseBestAction(int stato){
         return agente.chooseBestAction(stato);
     }

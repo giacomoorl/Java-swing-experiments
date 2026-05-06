@@ -10,6 +10,7 @@ public class GameLoop {
     private GameController controller;
     private GameView view;
     private TopPanel top;
+    
     // COSTRUTTORE
     public GameLoop(GameController controller, GameView view, TopPanel top) {
         System.out.println("Loop creato");
@@ -23,12 +24,10 @@ public class GameLoop {
     // DICE AL CONTROLLER DI AGGIORNARE IL GIOCO OGNI 16 MS
     // DICE AL PANNELLO SUPERIORE DI AGGIORNARE PUNTI E LIVEELO OGNI 16 MS
     // DICE ALLA VIEW DI RISDISEGNARE LO SCHERMO DEL GIOCO
-    private void update() {
+    private void update(){
         // DICE AL CONTROLLER DI AGGIORNARE IL GIOCO 
         controller.update();  
-          if(controller.isGameOver()) {
-                stop(); 
-          }
+        
         // DICE AL TOPPANEL DI AGGIORNARE PUNTI E LIVELLO 
         top.updatePoints(controller.getState().getPoints());
         top.updateLevel(controller.getState().getLevel());
@@ -37,11 +36,12 @@ public class GameLoop {
         view.repaint();
     }
     // DICE AL LOOP DI INIZIARE DARE I TEMPI DI AGGIORNAMENTO
-    public void run() {
+    public void run(){
         timer.start();
     }
     // DICE AL LOOP DI FERMARE IL TEMPO DI GIOCO
-    public void stop() {
+    public void stop(){
         timer.stop();
     }
+   
 }

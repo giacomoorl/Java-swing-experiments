@@ -1,6 +1,4 @@
 package breakout;
-
-import java.awt.Rectangle;
 /**
  * CLASSE BALL
  */
@@ -18,8 +16,8 @@ public class Ball {
         this.y = startY;
     }
     // METODO PER DIRE ALLA PALLINA DI MUOVERSI
-    public void move() {
-        x += dx;
+    public void move(){
+        //x += dx;
         y += dy;
     }
     // METODO PER DIRE ALLA PALLINA DI INVERTIRE LA DIREZIONE IN CASO DI COLLISIONI 
@@ -104,11 +102,7 @@ public class Ball {
         this.x = x; 
         this.y = y; 
     }
-    // CREA E RESTITUISCE IL RETTANGOLO DELLA PALLINA
-    // SERVE PER CONTROLLARE LE COLLISIONI (con mattoni e paddle)
-    public Rectangle getRettangle() {
-        return new java.awt.Rectangle((int)x, (int)y, diameter, diameter);
-    }
+    
     // DISEGNA LA BALL A SCHERMO
     public void draw(java.awt.Graphics g) {
         g.setColor(java.awt.Color.WHITE);
@@ -116,8 +110,12 @@ public class Ball {
     }
     // AUMENTA LA VELOCITÀ DELLA BALL AD OGNI LIVELLO
     public void increasesSpeed(int level) {
-        double newSpeed = 3 * Math.pow(1.08, level);;
-        dx = dx > 0 ? newSpeed : -newSpeed;
-        dy = dy > 0 ? newSpeed : -newSpeed;
+        double baseSpeed = 3.0;
+
+        double speed = baseSpeed + level * 0.5;
+
+        // mantieni direzione ma cambia modulo
+        dx = (dx >= 0 ? 1 : -1) * speed;
+        dy = (dy >= 0 ? 1 : -1) * speed;
     }
 }

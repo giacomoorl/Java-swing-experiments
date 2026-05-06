@@ -19,13 +19,8 @@ public class InputHandler implements KeyListener {
 
    @Override
     public void keyPressed(KeyEvent e) {
-
-        if(!controller.isHuman())
-            return; // 🔥 blocco totale AI mode
-
         int codice = e.getKeyCode();
-
-        if (codice == KeyEvent.VK_LEFT)
+        if(codice == KeyEvent.VK_LEFT)
             controller.moveLeft();
         else if (codice == KeyEvent.VK_RIGHT)
             controller.moveRight(view.getWidth());
