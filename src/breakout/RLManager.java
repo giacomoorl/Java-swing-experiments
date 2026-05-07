@@ -9,10 +9,12 @@ public class RLManager{
     // CAMPI DATI , RIFERIMENTO ALL'AGENTE CHE  GESTISCE
     private RLAgent agente;
     private boolean trainer;
+  
     // COSTRUTTORE
     public RLManager(RLAgent agent){
         System.out.println("RLManager creato");
         this.agente = agent;
+     
     }
     // SCEGLIE L'AZIONE DA FARE ( NEL TRAINING )
     public int chooseAction(int stato){
@@ -41,10 +43,8 @@ public class RLManager{
     public void endEpisode(){
         if(!trainer) 
             return;
-         double total = agente.closeEpisode();
-         System.out.println("EPISODIO: " + agente.getEpisodes() +
-                           " | epsilon: " + agente.getEpsilon() +
-                           " | reward: " + total);
+        double total = agente.closeEpisode();
+        
         try(FileWriter fw = new FileWriter("rewards.txt", true)) {
             fw.write(total + "\n");
         } 

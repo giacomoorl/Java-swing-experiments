@@ -1,6 +1,4 @@
 package breakout;
-
-import java.awt.Rectangle;
 /**
  * CLASSE ASTICELLA
  */

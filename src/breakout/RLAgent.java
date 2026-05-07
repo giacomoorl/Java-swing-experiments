@@ -135,12 +135,13 @@ public class RLAgent {
     }
     // CARICA LA TABELLA DI APPRENDIMENTO
    public void loadTable(String nameFile){
-        System.out.println("Table caricata");
+      
         File f = new File(nameFile);
         if(!f.exists()){
             this.episodes = 0;
             return;
         }
+        System.out.println("Table caricata");
         try(BufferedReader br = new BufferedReader(new FileReader(f))){
             String line;
             int i = 0;

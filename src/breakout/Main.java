@@ -14,7 +14,7 @@ public class Main {
             GameLoop loop = new GameLoop(controller, view, top);
             controller.setLoop(loop);
             // ✅ AI
-            RLAgent agente = new RLAgent(1, 3);   
+            RLAgent agente = new RLAgent(128, 3);   
             agente.loadTable("Table.txt"); 
             // MANAGER AI
             RLManager rlManager = new RLManager(agente);

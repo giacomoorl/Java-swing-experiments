@@ -17,13 +17,17 @@ public class InputHandler implements KeyListener {
         this.view = view;
     }
 
-   @Override
+    @Override
     public void keyPressed(KeyEvent e) {
+
         int codice = e.getKeyCode();
-        if(codice == KeyEvent.VK_LEFT)
+
+        if (codice == KeyEvent.VK_LEFT) {
             controller.moveLeft();
-        else if (codice == KeyEvent.VK_RIGHT)
-            controller.moveRight(view.getWidth());
+        }
+        else if (codice == KeyEvent.VK_RIGHT) {
+            controller.moveRight();
+        }
 
         view.repaint();
     }

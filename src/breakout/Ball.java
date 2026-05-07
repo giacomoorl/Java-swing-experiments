@@ -17,7 +17,7 @@ public class Ball {
     }
     // METODO PER DIRE ALLA PALLINA DI MUOVERSI
     public void move(){
-        //x += dx;
+        x += dx;
         y += dy;
     }
     // METODO PER DIRE ALLA PALLINA DI INVERTIRE LA DIREZIONE IN CASO DI COLLISIONI 
