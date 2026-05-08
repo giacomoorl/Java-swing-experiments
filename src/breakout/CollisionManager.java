@@ -1,7 +1,9 @@
 package breakout;
 
 public class CollisionManager {
-
+    public CollisionManager(){
+          System.out.println("CollisionManager creato");
+    }
     public boolean paddleCollision(Ball ball, Paddle paddle) {
         return ball.getY() + ball.getDiameter() >= paddle.getY() &&
                ball.getY() <= paddle.getY() + paddle.getHeight() &&

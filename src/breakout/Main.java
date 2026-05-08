@@ -22,7 +22,7 @@ public class Main {
             // PANNELLO INFERIORE CON PULSANTI
             BottomPanel bottom = new BottomPanel(loop, view, controller, rlManager);
             // FINESTRA PRINCIPALE
-            new MainWindow(view, top, bottom);
+            //new MainWindow(view, top, bottom);
             // INPUT DA TASTIERA
             InputHandler input = new InputHandler(controller, view);
             view.addKeyListener(input);

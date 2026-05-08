@@ -15,18 +15,18 @@ public class GameController {
     private static final int LENGTH = 1600;
 
     public GameController(GameState state) {
-
+        System.out.println("Controller creato");
         this.state = state;
         this.encoder = new StateEncoder();
         this.collisionManager = new CollisionManager();
         this.rewardSystem = new RewardSystem();
 
-        reward = 0;
-        lost = false;
+        this.reward = 0;
+        this.lost = false;
 
-        human = false;
-        aiTraining = false;
-        aiPlay = false;
+        this.human = false;
+        this.aiTraining = false;
+        this.aiPlay = false;
     }
 
     public void setLoop(GameLoop loop) {
@@ -35,18 +35,15 @@ public class GameController {
 
     public void setHuman() { 
         human = true;
-        aiTraining = false;
-        aiPlay = false;
+      
     }
     public void setAITraining() { 
         aiTraining = true;
-        human = false;
-        aiPlay=false;
+     
     }
     public void setAIPlay() { 
         aiPlay = true; 
-        aiTraining = false;
-        human = false;
+       
     }
 
     public void setRLManager(RLManager rlManager) {
@@ -70,8 +67,6 @@ public class GameController {
     // =========================
     public void update() {
 
-        reward = 0;
-
         Ball ball = state.getBall();
         Paddle paddle = state.getPaddle();
         Brick[][] bricks = state.getBricks();
@@ -80,53 +75,48 @@ public class GameController {
         ball.bounceWall(LENGTH);
         
         if(human){
-            if (allBricks(bricks)){
+            if(allBricks(bricks)){
                 state.nextLevel();
                 ball.increasesSpeed(state.getLevel());
             }
         }
 
         // =========================
-        // COLLISIONI + REWARD
-        // =========================
-        reward += handleCollisions(ball, paddle, bricks);
-
-        // =========================
         // AI TRAINING
         // =========================
-        if (aiTraining) {
-
+        if(aiTraining){
             stateRL = encoder.encode(state);
-
             action = rlManager.chooseAction(stateRL);
+            if(action == 1) 
+                moveLeft();
+            if(action == 2) 
+                moveRight();
 
-            if (action == 1) moveLeft();
-            if (action == 2) moveRight();
-
-            if (allBricks(bricks)) {
+            reward=0;
+            System.out.println("Reward iniziale");
+            reward += handleCollisions(ball, paddle, bricks);
+            if(allBricks(bricks)){
                 state.nextLevel();
                 ball.increasesSpeed(state.getLevel());
                 reward += rewardSystem.levelReward();
             }
-
             newStateRL = encoder.encode(state);
-
             rlManager.updateLearning(stateRL, action, reward, newStateRL);
         }
 
         // =========================
         // AI PLAY
         // =========================
-        if (aiPlay) {
-
+        if(aiPlay){
             stateRL = encoder.encode(state);
-
             action = rlManager.chooseBestAction(stateRL);
 
-            if (action == 1) moveLeft();
-            if (action == 2) moveRight();
+            if(action == 1) 
+                moveLeft();
+            if(action == 2) 
+                moveRight();
 
-            if (allBricks(bricks)) {
+            if(allBricks(bricks)){
                 state.nextLevel();
                 ball.increasesSpeed(state.getLevel());
             }
@@ -149,11 +139,10 @@ public class GameController {
     // =========================
     private int handleCollisions(Ball ball, Paddle paddle, Brick[][] bricks) {
 
-        int r = 0;
-
         if (collisionManager.paddleCollision(ball, paddle)) {
             ball.bouncePaddle(paddle);
-            r += rewardSystem.paddleReward();
+            reward += rewardSystem.paddleReward();
+            System.out.println("Reward collisione paddle e ball");
         }
 
         for (int i = 0; i < bricks.length; i++) {
@@ -166,12 +155,19 @@ public class GameController {
                     ball.reverseDirectionY();
                     state.increasesPoints(10);
 
-                    r += rewardSystem.brickReward();
+                    reward+= rewardSystem.brickReward();
+                    System.out.println("Reward collisione ball e brick");
                 }
             }
         }
+        if(allBricks(bricks)){
+            state.nextLevel();
+            ball.increasesSpeed(state.getLevel());
+            reward += rewardSystem.levelReward();
+            System.out.println("Reward disturtti tutti i mattocini");
+        }
 
-        return r;
+        return reward;
     }
 
     // =========================
@@ -181,10 +177,14 @@ public class GameController {
 
         if (human) {
             state.reset();
-            if (loop != null) loop.stop();
+            if (loop != null) 
+                loop.stop();
         }
 
         else if (aiTraining) {
+            reward += rewardSystem.deathPenalty();
+            System.out.println("Penalità persa la partita");
+            rlManager.updateLearning(stateRL, action, reward, stateRL);
             rlManager.endEpisode();
             state.reset();
         }

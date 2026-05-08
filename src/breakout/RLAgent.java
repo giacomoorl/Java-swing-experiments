@@ -70,7 +70,7 @@ public class RLAgent {
         episodes++; 
         // DECRESCE EPSILON
         epsilon = Math.max(0.02, 0.8 - (double)episodes / maxEpisodes);
-        System.out.println("Nuovo epsilon: " + epsilon);
+    
         return total;
     }
     // SCEGLIE L'AZIONE DA FARE IN BASE ALLO STATO

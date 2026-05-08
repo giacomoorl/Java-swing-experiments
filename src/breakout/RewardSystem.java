@@ -1,7 +1,9 @@
 package breakout;
 
 public class RewardSystem {
-
+    public RewardSystem(){
+          System.out.println("RewardSystem creato");
+    }
     public int paddleReward() {
         return 5;
     }
