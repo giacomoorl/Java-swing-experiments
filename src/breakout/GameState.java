@@ -16,9 +16,8 @@ public class GameState{
     private final int numberOfColumns = 10;
   
     // COSTRUTTORE
-    public GameState() {
+    public GameState(){
         System.out.println("Stato creato");
-        
         // INIZIALIZZA IL GIOCO AL LIVELLO 1 E I POINTS A ZERO
         level = 1;
         points = 0;

@@ -1,9 +1,10 @@
 package breakout;
 /*
-* CLASSE CHE AVVIA L'ESECUZIONE DEL GIOCO 
+* CLASSE CHE AVVIA L'ESECUZIONE DEL PROGRAMMA
 */
-public class Main {
-        public static void main(String[] args) {
+public class Main{
+        // METODO PRINCIPALE , IL PROGRAMMA INIZIA AD ESEGUIRE LE ISTRUZIONI JAVA DA QUI
+        public static void main(String[] args){
             // STATE , CONTROLLER , VIEW
             GameState state = new GameState();
             GameController controller = new GameController(state);
